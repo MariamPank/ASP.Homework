@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36202.13 d17.14
+VisualStudioVersion = 17.14.36202.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocialPosts", "SocialPosts.csproj", "{BE3C7DDA-1E55-4610-ABF9-1C3B761BF827}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies", "..\Movies\Movies.csproj", "{9DA3AD94-2619-4FD5-B698-49630B95678A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfficeSpaceRent", "..\OfficeSpaceRent\OfficeSpaceRent.csproj", "{F289843E-635D-4EC3-9C68-27C27B0BC3B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{BE3C7DDA-1E55-4610-ABF9-1C3B761BF827}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE3C7DDA-1E55-4610-ABF9-1C3B761BF827}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE3C7DDA-1E55-4610-ABF9-1C3B761BF827}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DA3AD94-2619-4FD5-B698-49630B95678A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DA3AD94-2619-4FD5-B698-49630B95678A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DA3AD94-2619-4FD5-B698-49630B95678A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DA3AD94-2619-4FD5-B698-49630B95678A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F289843E-635D-4EC3-9C68-27C27B0BC3B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F289843E-635D-4EC3-9C68-27C27B0BC3B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F289843E-635D-4EC3-9C68-27C27B0BC3B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F289843E-635D-4EC3-9C68-27C27B0BC3B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
