@@ -1,5 +1,6 @@
 
 using _4Paws.Data;
+using _4Paws.Helper.Owner;
 using _4Paws.Helper.Services;
 using _4Paws.Services.Auth;
 using _4Paws.Services.CareGiver;
@@ -28,6 +29,7 @@ namespace _4Paws
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+            builder.Services.AddScoped<ICurrentOwner, CurrentOwner>();
             builder.Services.AddScoped<IOwnerService, OwnerService>();
             builder.Services.AddScoped<ICaregiverService, CaregiverService>();
             builder.Services.AddScoped<IPetService, PetService>();
