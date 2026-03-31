@@ -11,14 +11,19 @@ namespace _4Paws.Models
         public string Notes { get; set; }
         public decimal AgreedFee { get; set; }
 
-        
         public int OwnerId { get; set; }
-        public Owner Owner { get; set; } = null!;
-
-        public int PetId { get; set; }
-        public Pet Pet { get; set; } = null!;
+        public Owner Owner { get; set; }
 
         public int CareGiverId { get; set; }
-        public CareGiver CareGiver { get; set; } = null!;
+        public CareGiver CareGiver { get; set; }
+
+        public int PetId { get; set; }
+        public Pet Pet { get; set; }
+
+        public int ListingId { get; set; }
+        public Listing Listing { get; set; }
+
+        public int ApplicationId { get; set; }
+        public Application Application { get; set; }
     }
 }

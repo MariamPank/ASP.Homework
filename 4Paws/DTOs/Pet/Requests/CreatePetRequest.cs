@@ -1,0 +1,10 @@
+﻿using _4Paws.Enums;
+
+namespace _4Paws.DTOs.Pet.Requests
+{
+    public class CreatePetRequest
+    {
+        public string PetName { get; set; }
+        public string Description { get; set; }
+    }
+}

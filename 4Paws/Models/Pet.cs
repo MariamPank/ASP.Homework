@@ -9,10 +9,10 @@ namespace _4Paws.Models
         public Rating PetRating { get; set; }
         public string Description { get; set; }
 
-
         public int OwnerId { get; set; }
         public Owner Owner { get; set; }
 
-        public List<Agreement> Agreements { get; set; } = new List<Agreement>();
+        public List<Agreement> Agreements { get; set; } = new();
+        public List<Listing> Listings { get; set; } = new();
     }
 }

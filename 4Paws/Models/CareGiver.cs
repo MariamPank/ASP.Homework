@@ -9,8 +9,10 @@ namespace _4Paws.Models
         public Rating CareGiverRating { get; set; }
 
         public int UserId { get; set; }
-        public User User { get; set; }
+        public UserModel User { get; set; }
 
-        public List<Agreement> Agreements { get; set; } = new List<Agreement>();
+        public List<Agreement> Agreements { get; set; } = new();
+        public List<Listing> Listings { get; set; } = new();
+        public List<Application> Applications { get; set; } = new();
     }
 }
