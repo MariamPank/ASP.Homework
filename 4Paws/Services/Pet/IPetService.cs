@@ -7,7 +7,7 @@ namespace _4Paws.Services.Pet
 {
     public interface IPetService
     {
-        Result<CreatePetResponse> CreatePet(CreatePetRequest request);
+        Result<CreateListingResponse> CreatePet(CreatePetRequest request);
         Result<PetResponse> GetById(int petId);
         Result<List<PetResponse>> GetMyPets();
         Result<PetResponse> UpdatePet(int petId, UpdatePetRequest request);

@@ -25,18 +25,18 @@ namespace _4Paws.Services.Pet
             _currentOwner = currentOwner;
         }
 
-        public Result<CreatePetResponse> CreatePet(CreatePetRequest request)
+        public Result<CreateListingResponse> CreatePet(CreatePetRequest request)
         {
             if (request == null)
-                return Result<CreatePetResponse>.BadRequest("Request is null");
+                return Result<CreateListingResponse>.BadRequest("Request is null");
 
             var owner = _currentOwner.GetCurrentOwner();
             if (owner == null)
-                return Result<CreatePetResponse>.NotFound("Owner profile not found");
+                return Result<CreateListingResponse>.NotFound("Owner profile not found");
 
             var petExists = _db.Pets.Any(x => x.OwnerId == owner.Id && x.PetName == request.PetName);
             if (petExists)
-                return Result<CreatePetResponse>.BadRequest("Pet with this name already exists");
+                return Result<CreateListingResponse>.BadRequest("Pet with this name already exists");
 
             var pet = new Models.Pet
             {
@@ -49,7 +49,7 @@ namespace _4Paws.Services.Pet
             _db.Pets.Add(pet);
             _db.SaveChanges();
 
-            var response = new CreatePetResponse
+            var response = new CreateListingResponse
             {
                 Id = pet.Id,
                 PetName = pet.PetName,
@@ -58,7 +58,7 @@ namespace _4Paws.Services.Pet
                 OwnerId = pet.OwnerId
             };
 
-            return Result<CreatePetResponse>.Ok(response);
+            return Result<CreateListingResponse>.Ok(response);
         }
 
         public Result<PetResponse> GetById(int petId)

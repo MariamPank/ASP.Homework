@@ -6,7 +6,8 @@ namespace _4Paws.Models
     public class Application : Entity
     {
         public string Message { get; set; }
-        public decimal ProposedFee { get; set; }
+        public decimal? ProposedFee { get; set; }
+        public AppliedBy AppliedBy { get; set; }
         public ApplicationStatus Status { get; set; }
 
         public int ListingId { get; set; }
@@ -17,6 +18,9 @@ namespace _4Paws.Models
 
         public int? CareGiverId { get; set; }
         public CareGiver? CareGiver { get; set; }
+
+        public int? PetId { get; set; }
+        public Pet? Pet { get; set; }
 
         public List<Agreement> Agreements { get; set; } = new();
     }

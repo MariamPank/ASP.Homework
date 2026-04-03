@@ -5,6 +5,8 @@ using _4Paws.DTOs.Caregiver.Requests;
 using _4Paws.DTOs.Caregiver.Responses;
 using _4Paws.Enums;
 using _4Paws.Helper.Services;
+using Azure;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace _4Paws.Services.CareGiver
@@ -86,10 +88,12 @@ namespace _4Paws.Services.CareGiver
 
         public Result<GetCaregiverDashboardResponse> GetCaregiverDashboard(int caregiverId)
         {
-            var caregiverExists = _db.CareGivers.Any(x => x.Id == caregiverId);
+            var caregiver = _db.CareGivers
+                .Include(x => x.Listings)
+                .Include(x => x.Agreements)
+                .FirstOrDefault(x => x.Id == caregiverId);
 
-            if (!caregiverExists)
-                return Result<GetCaregiverDashboardResponse>.NotFound("Caregiver not found");
+            if (caregiver == null) return Result<GetCaregiverDashboardResponse>.NotFound("Profile not found");
 
             var dashboard = _db.CareGivers
                 .Where(x => x.Id == caregiverId)

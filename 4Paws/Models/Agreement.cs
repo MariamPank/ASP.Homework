@@ -10,6 +10,7 @@ namespace _4Paws.Models
         public DateTime EndDate { get; set; }
         public string Notes { get; set; }
         public decimal AgreedFee { get; set; }
+        public DateTime CompleteAt { get; set; }
 
         public int OwnerId { get; set; }
         public Owner Owner { get; set; }

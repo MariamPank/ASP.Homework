@@ -2,7 +2,7 @@
 
 namespace _4Paws.DTOs.Pet.Responses
 {
-    public class CreatePetResponse
+    public class CreateListingResponse
     {
         public int Id { get; set; }
         public string PetName { get; set; }

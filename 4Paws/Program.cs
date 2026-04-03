@@ -2,8 +2,11 @@
 using _4Paws.Data;
 using _4Paws.Helper.Owner;
 using _4Paws.Helper.Services;
+using _4Paws.Services.Agreement;
+using _4Paws.Services.Application;
 using _4Paws.Services.Auth;
 using _4Paws.Services.CareGiver;
+using _4Paws.Services.Listing;
 using _4Paws.Services.Owner;
 using _4Paws.Services.Pet;
 using _4Paws.Services.User;
@@ -27,12 +30,15 @@ namespace _4Paws
 
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IAgreementService, AgreementService>();
+            builder.Services.AddScoped<IApplicationService, ApplicationService>();
+            builder.Services.AddScoped<ICaregiverService, CaregiverService>();
+            builder.Services.AddScoped<IListingService, ListingService>();
+            builder.Services.AddScoped<IOwnerService, OwnerService>();
+            builder.Services.AddScoped<IPetService, PetService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<ICurrentOwner, CurrentOwner>();
-            builder.Services.AddScoped<IOwnerService, OwnerService>();
-            builder.Services.AddScoped<ICaregiverService, CaregiverService>();
-            builder.Services.AddScoped<IPetService, PetService>();
 
             var app = builder.Build();
             if (app.Environment.IsDevelopment())
@@ -43,8 +49,7 @@ namespace _4Paws
 
             app.UseHttpsRedirection();
 
-            // ?? ??? Authentication ?? ?????, ?? ??????? ????????
-            // app.UseAuthentication();
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
