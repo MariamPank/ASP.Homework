@@ -13,6 +13,10 @@ namespace _4Paws.Data
         public DbSet<Application> Applications { get; set; }
         public DbSet<Agreement> Agreements { get; set; }
 
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
+        {
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

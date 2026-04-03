@@ -16,9 +16,9 @@ namespace _4Paws.Services.CareGiver
         private readonly DataContext _db;
 
         private readonly JwtService _jwt;
-        private readonly CurrentUserService _currentUser;
+        private readonly ICurrentUserService _currentUser;
 
-        public CaregiverService(DataContext db, JwtService jwt, CurrentUserService currentUser)
+        public CaregiverService(DataContext db, JwtService jwt, ICurrentUserService currentUser)
         {
             _db = db;
             _jwt = jwt;
