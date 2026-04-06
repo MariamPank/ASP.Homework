@@ -27,7 +27,6 @@ namespace _4Paws.Services.Auth
         public Result<int> Register(RegisterRequest req)
         {
             RegisterValidator validator = new RegisterValidator();
-
             var result = validator.Validate(req);
 
             if (!result.IsValid)
@@ -37,23 +36,34 @@ namespace _4Paws.Services.Auth
             }
 
             if (_db.Users.Any(u => u.Email == req.Email))
-                return Result<int>.BadRequest("user already exists.");
+                return Result<int>.BadRequest("User already exists.");
 
+            // 1. FIXED: Generate hash and actually USE it in the model
             string hash = BCrypt.Net.BCrypt.HashPassword(req.Password);
 
-            UserModel user = new UserModel (req.Username, req.Email, req.Password);
+            // Pass 'hash' here instead of 'req.Password'
+            UserModel user = new UserModel(req.Username, req.Email, hash);
 
             Random rand = new Random();
             user.VerificationCode = rand.Next(100_000, 999_999).ToString();
 
             _db.Users.Add(user);
-            _db.SaveChanges();
+            _db.SaveChanges(); // User is now safely in the Database!
 
-            string body = $"Verification code: {user.VerificationCode}";
+            // 2. FIXED: Wrap the email in a try-catch so it doesn't crash the request
+            try
+            {
+                string body = $"Verification code: {user.VerificationCode}";
+                _smtp.SendEmail("Email verification", user.Email, body);
+            }
+            catch (Exception ex)
+            {
+                // We log the error but still return OK because the user WAS created.
+                // In a real app, you might use a logger here: _logger.LogError(ex, "Email failed");
+                Console.WriteLine($"Email failed to send: {ex.Message}");
+            }
 
-            _smtp.SendEmail("Email verification", user.Email, body);
-
-
+            // 3. Return the ID. Even if the email failed, the user can now try to 'Resend Code' later.
             return Result<int>.Ok(user.Id);
         }
 
@@ -145,6 +155,24 @@ namespace _4Paws.Services.Auth
             _db.SaveChanges();
 
             return Result<int>.Ok(user.Id);
+        }
+
+        public Result<int> ClearUnverifiedUsers()
+        {
+            try
+            {
+                var unverifiedUsers = _db.Users.Where(u => !u.IsVerified).ToList();
+                int count = unverifiedUsers.Count;
+
+                _db.Users.RemoveRange(unverifiedUsers);
+                _db.SaveChanges();
+
+                return Result<int>.Ok(count); // Return how many were deleted
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.BadRequest("Could not clear users: " + ex.Message);
+            }
         }
     }
 }

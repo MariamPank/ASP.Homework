@@ -24,7 +24,7 @@ namespace _4Paws.Extensions
                 };
             });
 
-            services.AddAuthentication();
+            services.AddSwaggerGen();
             services.AddAuthorization();
             return services;
         }

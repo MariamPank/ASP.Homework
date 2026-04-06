@@ -12,6 +12,6 @@ namespace _4Paws.Services.Auth
         Result<TokenResponse> VerifyEmail(VerifyEmailRequest req);
         Result<int> ForgotPassword(string email);
         Result<int> ResetPassword(DTOs.Auth.Requests.ResetPasswordRequest req);
-
+        Result<int> ClearUnverifiedUsers();
     }
 }

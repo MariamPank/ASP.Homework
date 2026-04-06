@@ -50,5 +50,12 @@ namespace _4Paws.Controllers
 
             return StatusCode(result.Status, result);
         }
+
+        [HttpDelete("clear-unverified")]
+        public IActionResult ClearUnverified()
+        {
+            var result = _auth.ClearUnverifiedUsers();
+            return StatusCode(result.Status, result);
+        }
     }
 }

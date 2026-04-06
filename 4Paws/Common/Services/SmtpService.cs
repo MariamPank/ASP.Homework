@@ -5,14 +5,14 @@ namespace _4Paws.Common.Services
 {
     public class SmtpService
     {
-        private string _email = "testerhelper44@gmail.com";
-        private string _password = "eiws uhcl rmyp lhek";
+        private string _email = "testerhelper47@gmail.com";
+        private string _password = "ofkb hfxl fbhb tayc";
 
         public void SendEmail(string subject, string email, string body)
         {
             var mail = new MailMessage();
 
-            mail.From = new MailAddress(_email, "ALTA");
+            mail.From = new MailAddress(_email, "4Pets");
             mail.Subject = subject;
             mail.Body = body;
             mail.To.Add(email);
