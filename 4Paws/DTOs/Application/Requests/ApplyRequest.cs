@@ -7,6 +7,6 @@ namespace _4Paws.DTOs.Application.Requests
         public int ListingId { get; set; }
         public AppliedBy AppliedBy { get; set; }
         public string Message { get; set; } // "Hi, I'd love to watch your cat!"
-        public decimal? PropossedFee { get; set; }
+        public decimal? ProposedFee { get; set; }
     }
 }

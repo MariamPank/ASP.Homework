@@ -1,6 +1,6 @@
 ﻿using _4Paws.Common.Results;
 using _4Paws.DTOs.Caregiver.Requests;
-using _4Paws.Helper.Owner;
+using _4Paws.Helper.CareGiver;
 using _4Paws.Services.CareGiver;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +12,12 @@ namespace _4Paws.Controllers
     public class CareGiverController : ControllerBase
     {
         private readonly ICaregiverService _caregiverService;
-        private readonly ICurrentOwner _currentOwner;
+        private readonly ICurrentCareGiver _currentCareGiver;
 
-        public CareGiverController(ICaregiverService caregiverService, ICurrentOwner currentOwner)
+        public CareGiverController(ICaregiverService caregiverService, ICurrentCareGiver currentCareGiver)
         {
             _caregiverService = caregiverService;
-            _currentOwner = currentOwner;
+            _currentCareGiver = currentCareGiver;
         }
 
         [HttpPost]
@@ -30,30 +30,30 @@ namespace _4Paws.Controllers
         [HttpGet("Dashboard")]
         public IActionResult GetDashboard()
         {
-            var owner = _currentOwner.GetCurrentOwner();
-            if (owner == null) return Unauthorized("User profile not found.");
+            var careGiver = _currentCareGiver.GetCurrentCareGiver();
+            if (careGiver == null) return Unauthorized("User profile not found.");
 
-            var result = _caregiverService.GetCaregiverDashboard(owner.Id);
+            var result = _caregiverService.GetCaregiverDashboard(careGiver.Id);
             return StatusCode(result.Status, result);
         }
 
         [HttpGet("MyListings")]
         public IActionResult GetMyListings()
         {
-            var owner = _currentOwner.GetCurrentOwner();
-            if (owner == null) return Unauthorized();
+            var careGiver = _currentCareGiver.GetCurrentCareGiver();
+            if (careGiver == null) return Unauthorized();
 
-            var result = _caregiverService.GetCaregiverListings(owner.Id);
+            var result = _caregiverService.GetCaregiverListings(careGiver.Id);
             return StatusCode(result.Status, result);
         }
 
         [HttpGet("MyAgreements")]
         public IActionResult GetMyAgreements()
         {
-            var owner = _currentOwner.GetCurrentOwner();
-            if (owner == null) return Unauthorized();
+            var careGiver = _currentCareGiver.GetCurrentCareGiver();
+            if (careGiver == null) return Unauthorized();
 
-            var result = _caregiverService.GetCaregiverAgreements(owner.Id);
+            var result = _caregiverService.GetCaregiverAgreements(careGiver.Id);
             return StatusCode(result.Status, result);
         }
 

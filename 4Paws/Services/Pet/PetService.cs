@@ -1,27 +1,22 @@
 ﻿using _4Paws.Common.Results;
-using _4Paws.Common.Services;
 using _4Paws.Data;
-using _4Paws.DTOs.Owner.Responses;
 using _4Paws.DTOs.Pet.Requests;
 using _4Paws.DTOs.Pet.Responses;
 using _4Paws.Enums;
 using _4Paws.Helper.Owner;
 using _4Paws.Helper.Services;
-using _4Paws.Models;
-using Azure.Core;
+
 
 namespace _4Paws.Services.Pet
 {
     public class PetService : IPetService
     {
         private readonly DataContext _db;
-        private readonly ICurrentUserService _currentUser;
         private readonly ICurrentOwner _currentOwner;
 
         public PetService(DataContext db, ICurrentUserService currentUser, ICurrentOwner currentOwner)
         {
             _db = db;
-            _currentUser = currentUser;
             _currentOwner = currentOwner;
         }
 

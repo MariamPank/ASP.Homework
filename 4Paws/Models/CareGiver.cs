@@ -7,6 +7,7 @@ namespace _4Paws.Models
     {
         public string CareGiverName { get; set; }
         public Rating CareGiverRating { get; set; }
+        public string Bio { get; set; }
 
         public int UserId { get; set; }
         public UserModel User { get; set; }

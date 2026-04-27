@@ -5,6 +5,7 @@ using _4Paws.DTOs.Caregiver.Requests;
 using _4Paws.DTOs.Caregiver.Responses;
 using _4Paws.Enums;
 using _4Paws.Helper.Services;
+using _4Paws.Models;
 using Azure;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +25,8 @@ namespace _4Paws.Services.CareGiver
             _jwt = jwt;
             _currentUser = currentUser;
         }
+
+
         public Result<CreateCaregiverProfileResponse> CreateCaregiverProfile(CreateCaregiverProfileRequest request)
         {
             if (request == null)
@@ -31,6 +34,7 @@ namespace _4Paws.Services.CareGiver
 
             // 1. Get current userId (JWT-დან)
             var userId = _currentUser.CurrentUserId();
+            if (userId == null) return Result<CreateCaregiverProfileResponse>.Unauthorized();
 
             // 2. Check if user exists
             var userExists = _db.Users.Any(x => x.Id == userId);
@@ -40,7 +44,7 @@ namespace _4Paws.Services.CareGiver
             // 3. Check if Caregiver profile already exists
             var caregiverExists = _db.CareGivers.Any(x => x.UserId == userId);
             if (caregiverExists)
-                return Result<CreateCaregiverProfileResponse>.BadRequest("Caregiver profile already exists");
+                return Result<CreateCaregiverProfileResponse>.BadRequest("Caregiver profile already exists for this user.");
 
             // 4. Create Caregiver
             var caregiver = new Models.CareGiver
@@ -48,6 +52,7 @@ namespace _4Paws.Services.CareGiver
                 CareGiverName = request.UserName,
                 CareGiverRating = Rating.Average, // default
                 UserId = userId,
+                Bio = request.Bio,
             };
 
             _db.CareGivers.Add(caregiver);
@@ -64,7 +69,6 @@ namespace _4Paws.Services.CareGiver
 
             return Result<CreateCaregiverProfileResponse>.Ok(response);
         }
-
 
         public Result<GetCaregiverByIdResponse> GetCaregiverById(int caregiverId)
         {
