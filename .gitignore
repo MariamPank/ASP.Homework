@@ -111,3 +111,42 @@ ehthumbs.db
 Icon?
 desktop.ini
 .vs/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Build Output
+/dist/
+/tmp/
+/out-tsc/
+/bazel-out/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/runtime/
+
+# Testing
+/coverage/
+/e2e/screenshots/
+
+# Environment local overrides
+.env
+.env.local
+src/environments/environment.development.ts
+# Note: Keep src/environments/environment.ts tracked as a template
+
+# OS Metadata
+Thumbs.db
+Desktop.ini
+
+# Angular CLI Cache
+.angular/
