@@ -25,6 +25,7 @@ export interface UserProfile {
 
 export interface ApiResponse<T = any> {
   status: number;
-  message: string;
-  data?: T;
+  message: string | null;
+  errors: string | null;
+  value?: T;
 }
