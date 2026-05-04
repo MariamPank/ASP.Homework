@@ -1,0 +1,209 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f6f2;
+  padding: 1rem;
+}
+
+.login-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #ebebeb;
+}
+
+// ── Brand ──────────────────────────────────────────────
+
+.brand {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  .brand-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 0.25rem;
+    letter-spacing: -0.5px;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: #888;
+    margin: 0;
+  }
+}
+
+// ── Form Fields ────────────────────────────────────────
+
+.field {
+  margin-bottom: 1.25rem;
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 0.4rem;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #1a1a1a;
+    background: #fafafa;
+    transition: border-color 0.2s, background 0.2s;
+    box-sizing: border-box;
+    outline: none;
+
+    &::placeholder {
+      color: #bbb;
+    }
+
+    &:focus {
+      border-color: #4f46e5;
+      background: #fff;
+    }
+  }
+}
+
+// ── Password toggle ────────────────────────────────────
+
+.password-wrapper {
+  position: relative;
+
+  input {
+    padding-right: 4.5rem;
+  }
+
+  .toggle-pw {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0;
+    font-weight: 600;
+
+    &:hover {
+      color: #4f46e5;
+    }
+  }
+}
+
+// ── Forgot password ────────────────────────────────────
+
+.forgot {
+  text-align: right;
+  margin-bottom: 1.5rem;
+  margin-top: -0.5rem;
+
+  a {
+    font-size: 0.82rem;
+    color: #4f46e5;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// ── Error message ──────────────────────────────────────
+
+.error-msg {
+  background: #fff1f1;
+  color: #c0392b;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+// ── Submit button ──────────────────────────────────────
+
+.btn-submit {
+  width: 100%;
+  padding: 0.8rem;
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+
+  &:hover:not(:disabled) {
+    background: #3730c4;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// ── Spinner ────────────────────────────────────────────
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── Register link ──────────────────────────────────────
+
+.register-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.88rem;
+  color: #888;
+
+  a {
+    color: #4f46e5;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
