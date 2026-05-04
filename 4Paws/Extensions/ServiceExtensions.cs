@@ -28,11 +28,14 @@ namespace _4Paws.Extensions
             {
                 options.AddPolicy("AllowAngular", policy =>
                 {
-                    policy.SetIsOriginAllowed(origin => origin.StartsWith("http://localhost"))
+                    policy.SetIsOriginAllowed(origin =>
+                            origin.StartsWith("http://localhost") ||
+                            origin.StartsWith("https://localhost"))
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });
             });
+
             services.AddJwt(config);
 
             services.AddDbContext<DataContext>(o => o.UseSqlServer(config.GetConnectionString("DefaultConnection")));

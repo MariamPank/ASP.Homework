@@ -4,6 +4,8 @@
     {
         public static WebApplication UseApp(this WebApplication app)
         {
+            app.UseCors("AllowAngular");
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -11,8 +13,6 @@
             }
 
             app.UseHttpsRedirection();
-
-            app.UseCors("AllowAngular");
 
             app.UseAuthentication();
             app.UseAuthorization();

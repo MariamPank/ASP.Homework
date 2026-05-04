@@ -12,7 +12,7 @@ import {
   providedIn: 'root',
 })
 export class UserService {
-  private readonly BASE_URL = 'http://localhost:5281/api/users';
+  private readonly BASE_URL = 'http://localhost:5281/api/Users';
 
   constructor(private http: HttpClient) {}
 
