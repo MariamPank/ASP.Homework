@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { PetListComponent } from './features/listings/pet-list/pet-list.component';
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [PetListComponent],
+  imports: [],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
