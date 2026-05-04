@@ -14,7 +14,7 @@ import {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly BASE_URL = 'http://localhost:5000/api/auth';
+  private readonly BASE_URL = 'http://localhost:5281/api/auth';
 
   constructor(private http: HttpClient) {}
 
@@ -28,11 +28,11 @@ export class AuthService {
 
   login(req: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.BASE_URL}/login`, req).pipe(
-      tap((res) => {
-        if (res.data?.token) {
-          localStorage.setItem('token', res.data.token);
-        }
-      })
+    tap((res) => {
+      if (res.value?.accessToken) {
+        localStorage.setItem('token', res.value.accessToken);
+      }
+    })
     );
   }
 

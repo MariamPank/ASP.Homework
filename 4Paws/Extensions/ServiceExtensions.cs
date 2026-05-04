@@ -23,6 +23,16 @@ namespace _4Paws.Extensions
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngular", policy =>
+                {
+                    policy.SetIsOriginAllowed(origin => origin.StartsWith("http://localhost"))
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
             services.AddJwt(config);
 
             services.AddDbContext<DataContext>(o => o.UseSqlServer(config.GetConnectionString("DefaultConnection")));

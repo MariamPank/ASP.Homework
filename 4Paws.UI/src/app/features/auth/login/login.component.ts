@@ -39,14 +39,19 @@ export class LoginComponent {
     this.errorMessage = '';
 
     this.authService.login(this.form).subscribe({
-      next: (res) => {
-        this.isLoading = false;
+     next: (res) => {
+      this.isLoading = false;
+      if (res.value?.accessToken) {
         this.router.navigate(['/profile']);
+      } else {
+        this.errorMessage = res.message || 'Login failed.';
+      }
       },
-      error: (err) => {
+    error: (err) => {
         this.isLoading = false;
         this.errorMessage = err.error?.message || 'Login failed. Please try again.';
-      },
+    },
     });
   }
 }
+
