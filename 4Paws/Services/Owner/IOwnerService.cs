@@ -1,6 +1,7 @@
 ﻿using _4Paws.Common.Results;
 using _4Paws.DTOs.Owner.Requests;
 using _4Paws.DTOs.Owner.Responses;
+using _4Paws.DTOs.Pet.Responses;
 
 namespace _4Paws.Services.Owner
 {
@@ -11,6 +12,7 @@ namespace _4Paws.Services.Owner
         Result<GetOwnerDashboardResponse> GetOwnerDashboard(int ownerId);
         Result<List<GetOwnerListingsResponse>> GetOwnerListings(int ownerId);
         Result<List<GetOwnerAgreementsResponse>> GetOwnerAgreements(int ownerId);
+        Result<List<PetResponse>> GetMyPets();
 
     }
 }

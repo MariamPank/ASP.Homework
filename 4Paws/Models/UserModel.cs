@@ -10,6 +10,7 @@ namespace _4Paws.Models
         public string PasswordHash { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public bool IsVerified { get; set; } = false;
+        public bool IsBanned { get; set; } = false;
         public string? VerificationCode { get; set; }
         public UserRole Role { get; set; } = UserRole.User;
 

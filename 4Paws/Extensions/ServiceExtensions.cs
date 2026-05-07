@@ -1,8 +1,10 @@
 ﻿using _4Paws.Common.Services;
 using _4Paws.Data;
+using _4Paws.Helper.Adm;
 using _4Paws.Helper.CareGiver;
 using _4Paws.Helper.Owner;
 using _4Paws.Helper.Services;
+using _4Paws.Services.Admin;
 using _4Paws.Services.Agreement;
 using _4Paws.Services.Application;
 using _4Paws.Services.Auth;
@@ -52,6 +54,8 @@ namespace _4Paws.Extensions
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<ICurrentOwner, CurrentOwner>();
             services.AddScoped<ICurrentCareGiver, CurrentCareGiver>();
+            services.AddScoped<IAdminService, AdminService>();
+            services.AddScoped<IAdministrator, Administrator>();
 
             services.AddScoped<SmtpService>();
             services.AddScoped<JwtService>();

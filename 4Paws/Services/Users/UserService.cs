@@ -1,7 +1,10 @@
 ﻿using _4Paws.Common.Results;
 using _4Paws.Data;
+using _4Paws.DTOs.Pet.Responses;
 using _4Paws.DTOs.User.Requests;
 using _4Paws.DTOs.User.Responses;
+using _4Paws.Helper.Owner;
+using _4Paws.Helper.Services;
 using _4Paws.Services.Users;
 
 namespace _4Paws.Services.User
@@ -9,9 +12,15 @@ namespace _4Paws.Services.User
     public class UserService : IUserService
     {
         private readonly DataContext _db;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly ICurrentOwner _currentOwner;
 
-        public UserService (DataContext db) => _db = db;
-
+        public UserService (DataContext db, ICurrentUserService currentUserService, ICurrentOwner currentOwner)
+        {
+            _db = db;
+            _currentUserService = currentUserService;
+            _currentOwner = currentOwner;
+        }
         public Result<UserResponse> GetById(int userId)
         {
             var user = _db.Users.Find(userId);
@@ -29,7 +38,6 @@ namespace _4Paws.Services.User
 
             return Result<UserResponse>.Success(userId, response);
         }
-
         public Result<int> ChangePassword(int userId, ChangePasswordRequest request)
         {
             var user = _db.Users
@@ -45,7 +53,6 @@ namespace _4Paws.Services.User
 
             return Result<int>.Ok(user.Id);
         }
-
         public Result<int> DeleteUser(int userId)
         {
             var user = _db.Users
@@ -58,7 +65,6 @@ namespace _4Paws.Services.User
 
             return Result<int>.Ok(user.Id);
         }
-
         public Result<int> EditUser(int userId, EditUserRequest request)
         {
             if (request == null)

@@ -3,7 +3,9 @@ using _4Paws.Common.Services;
 using _4Paws.Data;
 using _4Paws.DTOs.Owner.Requests;
 using _4Paws.DTOs.Owner.Responses;
+using _4Paws.DTOs.Pet.Responses;
 using _4Paws.Enums;
+using _4Paws.Helper.Owner;
 using _4Paws.Helper.Services;
 
 namespace _4Paws.Services.Owner
@@ -14,12 +16,14 @@ namespace _4Paws.Services.Owner
 
         private readonly JwtService _jwt;
         private readonly ICurrentUserService _currentUser;
+        private readonly ICurrentOwner _currentOwner;
 
-        public OwnerService(DataContext db, JwtService jwt, ICurrentUserService currentUser)
+        public OwnerService(DataContext db, JwtService jwt, ICurrentUserService currentUser, ICurrentOwner currentOwner)
         {
             _db = db;
             _jwt = jwt;
             _currentUser = currentUser;
+            _currentOwner = currentOwner;
         }
         public Result<CreateOwnerProfileResponse> CreateOwnerProfile(CreateOwnerProfileRequest request)
         {
@@ -176,6 +180,28 @@ namespace _4Paws.Services.Owner
                 .ToList();
 
             return Result<List<GetOwnerListingsResponse>>.Ok(listings);
+        }
+
+        public Result<List<PetResponse>> GetMyPets()
+        {
+            var owner = _currentOwner.GetCurrentOwner();
+
+            if (owner == null)
+                return Result<List<PetResponse>>.NotFound("Owner profile not found");
+
+            var pets = _db.Pets
+                .Where(x => x.OwnerId == owner.Id)
+                .Select(x => new PetResponse
+                {
+                    Id = x.Id,
+                    PetName = x.PetName,
+                    PetRating = x.PetRating,
+                    Description = x.Description,
+                    OwnerId = x.OwnerId
+                })
+                .ToList();
+
+            return Result<List<PetResponse>>.Ok(pets);
         }
     }
 }
