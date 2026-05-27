@@ -2,16 +2,19 @@
 using _4Paws.DTOs.Listing.Requests;
 using _4Paws.DTOs.Listing.Responses;
 using _4Paws.Services.Listing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace _4Paws.Controllers
 {
+    [Authorize]
     [Route("api/[controller]"), ApiController]
     public class ListingsController : ControllerBase
     {
         private readonly IListingService _listingService;
         public ListingsController(IListingService listingService) => _listingService = listingService;
 
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult GetAll()
         {

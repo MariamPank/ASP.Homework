@@ -38,6 +38,14 @@ namespace _4Paws.Controllers
             return StatusCode(result.Status, result);
         }
 
+        [HttpGet("users/deleted")]
+        public IActionResult GetDeletedUsers()
+        {
+            if (!_administrator.IsAdmin()) return Forbid();
+            var result = _adminService.GetDeletedUsers();
+            return StatusCode(result.Status, result);
+        }
+
         [HttpGet("users/{userId}")]
         public IActionResult GetUserById(int userId)
         {
@@ -51,6 +59,14 @@ namespace _4Paws.Controllers
         {
             if (!_administrator.IsAdmin()) return Forbid();
             var result = _adminService.DeleteUser(userId);
+            return StatusCode(result.Status, result);
+        }
+
+        [HttpPut("users/{userId}/restore")]
+        public IActionResult RestoreUser(int userId)
+        {
+            if (!_administrator.IsAdmin()) return Forbid();
+            var result = _adminService.RestoreUser(userId);
             return StatusCode(result.Status, result);
         }
 
@@ -70,6 +86,14 @@ namespace _4Paws.Controllers
             return StatusCode(result.Status, result);
         }
 
+        [HttpDelete("clear-unverified")]
+        public IActionResult ClearUnverified()
+        {
+            if (!_administrator.IsAdmin()) return Forbid();
+            var result = _adminService.ClearUnverifiedUsers();
+            return StatusCode(result.Status, result);
+        }
+
         // ── Listings ──────────────────────────────────────────────────────
 
         [HttpGet("listings")]
@@ -80,11 +104,27 @@ namespace _4Paws.Controllers
             return StatusCode(result.Status, result);
         }
 
+        [HttpGet("listings/deleted")]
+        public IActionResult GetDeletedListings()
+        {
+            if (!_administrator.IsAdmin()) return Forbid();
+            var result = _adminService.GetDeletedListings();
+            return StatusCode(result.Status, result);
+        }
+
         [HttpDelete("listings/{listingId}")]
         public IActionResult DeleteListing(int listingId)
         {
             if (!_administrator.IsAdmin()) return Forbid();
             var result = _adminService.DeleteListing(listingId);
+            return StatusCode(result.Status, result);
+        }
+
+        [HttpPut("listings/{listingId}/restore")]
+        public IActionResult RestoreListing(int listingId)
+        {
+            if (!_administrator.IsAdmin()) return Forbid();
+            var result = _adminService.RestoreListing(listingId);
             return StatusCode(result.Status, result);
         }
 

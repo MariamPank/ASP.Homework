@@ -1,56 +1,52 @@
 ﻿using _4Paws.Common.Results;
-using _4Paws.Common.Services;
 using _4Paws.Data;
 using _4Paws.DTOs.Caregiver.Requests;
 using _4Paws.DTOs.Caregiver.Responses;
 using _4Paws.Enums;
 using _4Paws.Helper.Services;
-using _4Paws.Models;
-using Azure;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.Extensions.Caching.Memory;
 
 namespace _4Paws.Services.CareGiver
 {
     public class CaregiverService : ICaregiverService
     {
         private readonly DataContext _db;
-
-        private readonly JwtService _jwt;
         private readonly ICurrentUserService _currentUser;
+        private readonly IMemoryCache _cache;
 
-        public CaregiverService(DataContext db, JwtService jwt, ICurrentUserService currentUser)
+        private readonly TimeSpan CACHE_TTL = TimeSpan.FromMinutes(5);
+
+        public CaregiverService(
+            DataContext db,
+            ICurrentUserService currentUser,
+            IMemoryCache cache)
         {
             _db = db;
-            _jwt = jwt;
             _currentUser = currentUser;
+            _cache = cache;
         }
-
 
         public Result<CreateCaregiverProfileResponse> CreateCaregiverProfile(CreateCaregiverProfileRequest request)
         {
             if (request == null)
                 return Result<CreateCaregiverProfileResponse>.BadRequest("Request is null");
 
-            // 1. Get current userId (JWT-დან)
             var userId = _currentUser.CurrentUserId();
             if (userId == null) return Result<CreateCaregiverProfileResponse>.Unauthorized();
 
-            // 2. Check if user exists
             var userExists = _db.Users.Any(x => x.Id == userId);
             if (!userExists)
                 return Result<CreateCaregiverProfileResponse>.NotFound("User not found");
 
-            // 3. Check if Caregiver profile already exists
             var caregiverExists = _db.CareGivers.Any(x => x.UserId == userId);
             if (caregiverExists)
                 return Result<CreateCaregiverProfileResponse>.BadRequest("Caregiver profile already exists for this user.");
 
-            // 4. Create Caregiver
             var caregiver = new Models.CareGiver
             {
                 CareGiverName = request.UserName,
-                CareGiverRating = Rating.Average, // default
+                CareGiverRating = Rating.Average,
                 UserId = userId,
                 Bio = request.Bio,
             };
@@ -58,26 +54,29 @@ namespace _4Paws.Services.CareGiver
             _db.CareGivers.Add(caregiver);
             _db.SaveChanges();
 
-            // 5. Map response
-            var response = new CreateCaregiverProfileResponse
+            return Result<CreateCaregiverProfileResponse>.Ok(new CreateCaregiverProfileResponse
             {
                 Id = caregiver.Id,
                 UserName = caregiver.CareGiverName,
                 CaregiverRating = caregiver.CareGiverRating,
                 UserId = caregiver.UserId
-            };
-
-            return Result<CreateCaregiverProfileResponse>.Ok(response);
+            });
         }
 
         public Result<GetCaregiverByIdResponse> GetCaregiverById(int caregiverId)
         {
-            var caregiverExists = _db.CareGivers.Any(x => x.Id == caregiverId);
+            // ── Cache key scoped to caregiverId ───────────────────────────
+            var cacheKey = $"caregiver_profile_{caregiverId}";
 
+            if (_cache.TryGetValue(cacheKey, out GetCaregiverByIdResponse cached))
+                return Result<GetCaregiverByIdResponse>.Ok(cached);
+
+            var caregiverExists = _db.CareGivers.Any(x => x.Id == caregiverId);
             if (!caregiverExists)
                 return Result<GetCaregiverByIdResponse>.NotFound("Caregiver not found");
 
-            var caregiver = _db.CareGivers.Where(x => x.Id == caregiverId)
+            var caregiver = _db.CareGivers
+                .Where(x => x.Id == caregiverId)
                 .Select(x => new GetCaregiverByIdResponse
                 {
                     Id = x.Id,
@@ -87,17 +86,18 @@ namespace _4Paws.Services.CareGiver
                 })
                 .FirstOrDefault();
 
+            _cache.Set(cacheKey, caregiver, CACHE_TTL);
+
             return Result<GetCaregiverByIdResponse>.Ok(caregiver);
         }
 
         public Result<GetCaregiverDashboardResponse> GetCaregiverDashboard(int caregiverId)
         {
-            var caregiver = _db.CareGivers
-                .Include(x => x.Listings)
-                .Include(x => x.Agreements)
-                .FirstOrDefault(x => x.Id == caregiverId);
+            // ── Cache key scoped to caregiverId ───────────────────────────
+            var cacheKey = $"caregiver_dashboard_{caregiverId}";
 
-            if (caregiver == null) return Result<GetCaregiverDashboardResponse>.NotFound("Profile not found");
+            if (_cache.TryGetValue(cacheKey, out GetCaregiverDashboardResponse cached))
+                return Result<GetCaregiverDashboardResponse>.Ok(cached);
 
             var dashboard = _db.CareGivers
                 .Where(x => x.Id == caregiverId)
@@ -106,40 +106,38 @@ namespace _4Paws.Services.CareGiver
                     CaregiverId = x.Id,
                     UserName = x.CareGiverName,
                     CaregiverRating = x.CareGiverRating,
+
                     TotalListings = x.Listings.Count(),
                     ActiveListings = x.Listings.Count(l => l.Status == ListingStatus.Open),
-
                     TotalAgreements = x.Agreements.Count(),
                     ActiveAgreements = x.Agreements.Count(a => a.Status == AgreementStatus.Active),
                     CompletedAgreements = x.Agreements.Count(a => a.Status == AgreementStatus.Completed),
 
                     RecentListings = x.Listings
-                        .OrderByDescending(l => l.Id)
-                        .Take(5)
+                        .OrderByDescending(l => l.Id).Take(5)
                         .Select(l => new CaregiverListingShortResponse
                         {
                             Id = l.Id,
                             Title = l.Title,
                             Status = l.Status
-                        })
-                        .ToList(),
+                        }).ToList(),
 
                     RecentAgreements = x.Agreements
-                        .OrderByDescending(a => a.Id)
-                        .Take(5)
+                        .OrderByDescending(a => a.Id).Take(5)
                         .Select(a => new CaregiverAgreementShortResponse
                         {
                             Id = a.Id,
                             Status = a.Status,
                             PetName = a.Pet.PetName,
                             OwnerName = a.Owner.UserName
-                        })
-                        .ToList()
+                        }).ToList()
                 })
                 .FirstOrDefault();
 
             if (dashboard == null)
                 return Result<GetCaregiverDashboardResponse>.NotFound("Caregiver dashboard not found");
+
+            _cache.Set(cacheKey, dashboard, CACHE_TTL);
 
             return Result<GetCaregiverDashboardResponse>.Ok(dashboard);
         }
@@ -147,7 +145,6 @@ namespace _4Paws.Services.CareGiver
         public Result<List<GetCaregiverAgreementsResponse>> GetCaregiverAgreements(int caregiverId)
         {
             var caregiverExists = _db.CareGivers.Any(x => x.Id == caregiverId);
-
             if (!caregiverExists)
                 return Result<List<GetCaregiverAgreementsResponse>>.NotFound("Caregiver not found");
 
@@ -171,7 +168,6 @@ namespace _4Paws.Services.CareGiver
         public Result<List<GetCaregiverListingsResponse>> GetCaregiverListings(int caregiverId)
         {
             var caregiverExists = _db.CareGivers.Any(x => x.Id == caregiverId);
-
             if (!caregiverExists)
                 return Result<List<GetCaregiverListingsResponse>>.NotFound("Caregiver not found");
 
@@ -189,6 +185,13 @@ namespace _4Paws.Services.CareGiver
                 .ToList();
 
             return Result<List<GetCaregiverListingsResponse>>.Ok(listings);
+        }
+
+        // ── Cache invalidation helper — call when caregiver data changes ──
+        public void InvalidateCaregiverCache(int caregiverId)
+        {
+            _cache.Remove($"caregiver_profile_{caregiverId}");
+            _cache.Remove($"caregiver_dashboard_{caregiverId}");
         }
     }
 }

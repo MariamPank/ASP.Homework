@@ -1,4 +1,5 @@
-﻿using _4Paws.Models;
+﻿using _4Paws.Common.Entity;
+using _4Paws.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace _4Paws.Data
@@ -12,6 +13,7 @@ namespace _4Paws.Data
         public DbSet<Listing> Listings { get; set; }
         public DbSet<Application> Applications { get; set; }
         public DbSet<Agreement> Agreements { get; set; }
+        public DbSet<Review> Reviews { get; set; }  // ← new
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -20,6 +22,22 @@ namespace _4Paws.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // ── Global Soft Delete Filter ─────────────────────────────────
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (typeof(Entity).IsAssignableFrom(entityType.ClrType))
+                {
+                    var method = typeof(DataContext)
+                        .GetMethod(nameof(GetSoftDeleteFilter),
+                            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!
+                        .MakeGenericMethod(entityType.ClrType);
+
+                    var filter = method.Invoke(null, null);
+                    modelBuilder.Entity(entityType.ClrType)
+                        .HasQueryFilter((System.Linq.Expressions.LambdaExpression)filter!);
+                }
+            }
 
             // =========================
             // User
@@ -39,7 +57,8 @@ namespace _4Paws.Data
 
             modelBuilder.Entity<UserModel>()
                 .HasIndex(x => x.Email)
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0");
 
             modelBuilder.Entity<UserModel>()
                 .Property(x => x.PasswordHash)
@@ -54,12 +73,6 @@ namespace _4Paws.Data
             // =========================
             modelBuilder.Entity<Owner>().HasKey(x => x.Id);
             modelBuilder.Entity<Owner>().Property(x => x.Id).ValueGeneratedOnAdd();
-
-            //modelBuilder.Entity<Owner>()
-            //    .Property(x => x.Id)
-            //    .IsRequired()
-            //    .HasMaxLength(100);
-
             modelBuilder.Entity<Owner>()
                 .HasOne(x => x.User)
                 .WithOne(x => x.Owner)
@@ -68,19 +81,14 @@ namespace _4Paws.Data
 
             modelBuilder.Entity<Owner>()
                 .HasIndex(x => x.UserId)
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0");
 
             // =========================
             // CareGiver
             // =========================
             modelBuilder.Entity<CareGiver>().HasKey(x => x.Id);
             modelBuilder.Entity<CareGiver>().Property(x => x.Id).ValueGeneratedOnAdd();
-
-            //modelBuilder.Entity<CareGiver>()
-            //    .Property(x => x.CareGiverName)
-            //    .IsRequired()
-            //    .HasMaxLength(100);
-
             modelBuilder.Entity<CareGiver>()
                 .HasOne(x => x.User)
                 .WithOne(x => x.CareGiver)
@@ -89,7 +97,8 @@ namespace _4Paws.Data
 
             modelBuilder.Entity<CareGiver>()
                 .HasIndex(x => x.UserId)
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0");
 
             // =========================
             // Pet
@@ -224,6 +233,91 @@ namespace _4Paws.Data
                 .WithMany(x => x.Agreements)
                 .HasForeignKey(x => x.ApplicationId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================
+            // Review
+            // =========================
+            modelBuilder.Entity<Review>().HasKey(x => x.Id);
+            modelBuilder.Entity<Review>().Property(x => x.Id).ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Review>()
+                .Property(x => x.Comment)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(x => x.Agreement)
+                .WithMany()
+                .HasForeignKey(x => x.AgreementId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(x => x.Reviewer)
+                .WithMany()
+                .HasForeignKey(x => x.ReviewerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(x => x.Owner)
+                .WithMany()
+                .HasForeignKey(x => x.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(x => x.CareGiver)
+                .WithMany()
+                .HasForeignKey(x => x.CareGiverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(x => x.Pet)
+                .WithMany()
+                .HasForeignKey(x => x.PetId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
+
+        private static System.Linq.Expressions.Expression<Func<T, bool>> GetSoftDeleteFilter<T>()
+            where T : Entity
+        {
+            return e => !e.IsDeleted;
+        }
+
+        public override int SaveChanges()
+        {
+            var modified = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Modified && e.Entity is Entity);
+            foreach (var entry in modified)
+                ((Entity)entry.Entity).UpdatedAt = DateTime.UtcNow;
+
+            var deleted = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Deleted && e.Entity is Entity);
+            foreach (var entry in deleted)
+            {
+                entry.State = EntityState.Modified;
+                ((Entity)entry.Entity).IsDeleted = true;
+                ((Entity)entry.Entity).DeletedAt = DateTime.UtcNow;
+            }
+
+            return base.SaveChanges();
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
+        {
+            var modified = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Modified && e.Entity is Entity);
+            foreach (var entry in modified)
+                ((Entity)entry.Entity).UpdatedAt = DateTime.UtcNow;
+
+            var deleted = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Deleted && e.Entity is Entity);
+            foreach (var entry in deleted)
+            {
+                entry.State = EntityState.Modified;
+                ((Entity)entry.Entity).IsDeleted = true;
+                ((Entity)entry.Entity).DeletedAt = DateTime.UtcNow;
+            }
+
+            return await base.SaveChangesAsync(ct);
+        }
+
     }
 }

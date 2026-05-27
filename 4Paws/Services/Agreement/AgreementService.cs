@@ -1,17 +1,10 @@
 ﻿using _4Paws.Common.Results;
 using _4Paws.Data;
 using _4Paws.DTOs.Agreement.Responses;
-using _4Paws.DTOs.Application.Responses;
-using _4Paws.DTOs.Listing.Requests;
-using _4Paws.DTOs.Listing.Responses;
 using _4Paws.Enums;
 using _4Paws.Helper.CareGiver;
 using _4Paws.Helper.Owner;
-using _4Paws.Models;
-using Azure.Core;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace _4Paws.Services.Agreement
 {
@@ -69,7 +62,7 @@ namespace _4Paws.Services.Agreement
                 StartDate = listing.StartDate,
                 EndDate = listing.EndDate,
                 Status = AgreementStatus.Active,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             _db.Agreements.Add(agreement);
@@ -135,17 +128,13 @@ namespace _4Paws.Services.Agreement
             if (owner == null)
                 return Result<AgreementResponse>.NotFound("Profile not found");
 
-            var agreement = _db.Agreements
-                .Where(x => x.OwnerId == owner.Id)
-                .FirstOrDefault(x => x.Id == id);
-            if (agreement == null) return Result<AgreementResponse>.NotFound("Agreement not found");
+            var agreement = _db.Agreements.FirstOrDefault(x => x.Id == id && x.OwnerId == owner.Id);
+            if (agreement == null) return Result<AgreementResponse>.NotFound("Agreement not found or access denied.");
 
-            if (agreement.OwnerId != owner.Id)
-                return Result<AgreementResponse>.BadRequest("Only the pet owner can confirm completion.");
             if (agreement.Status != AgreementStatus.Active)
                 return Result<AgreementResponse>.BadRequest("Only active agreements can be completed.");
             agreement.Status = AgreementStatus.Completed;
-            agreement.CompleteAt = DateTime.Now;
+            agreement.CompleteAt = DateTime.UtcNow;
 
             _db.SaveChanges();
 

@@ -70,7 +70,7 @@ namespace _4Paws.Services.Application
                 ListingId = request.ListingId,
                 Message = request.Message,
                 Status = ApplicationStatus.Pending,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 ProposedFee = request.ProposedFee,
                 OwnerId = applicantOwnerId,
                 CareGiverId = applicantCareGiverId
@@ -79,15 +79,7 @@ namespace _4Paws.Services.Application
             _db.Applications.Add(application);
             _db.SaveChanges();
 
-            return Result<ApplicationResponse>.Ok(new ApplicationResponse
-            {
-                Id = application.Id,
-                ListingId = application.ListingId,
-                ApplicantName = applicantName,
-                Message = application.Message,
-                Status = application.Status,
-                CreatedAt = application.CreatedAt
-            });
+            return Result<ApplicationResponse>.Ok(MapToResponse(application));
         }
 
         public Result<IEnumerable<ApplicationResponse>> GetApplicationsForListing(int listingId)
@@ -128,15 +120,7 @@ namespace _4Paws.Services.Application
                 .ToList();
 
             // 5. Map to response using LINQ Select (cleaner than foreach)
-            var response = applications.Select(app => new ApplicationResponse
-            {
-                Id = app.Id,
-                ListingId = app.ListingId,
-                ApplicantName = app.Owner?.User?.FullName ?? app.CareGiver?.CareGiverName ?? "Unknown",
-                Message = app.Message,
-                Status = app.Status,
-                CreatedAt = app.CreatedAt,
-            });
+            var response = applications.Select(MapToResponse);
 
             return Result<IEnumerable<ApplicationResponse>>.Ok(response);
         }
@@ -162,15 +146,7 @@ namespace _4Paws.Services.Application
                 .OrderByDescending(x => x.CreatedAt)
                 .ToList();
 
-            var response = applications.Select(app => new ApplicationResponse
-            {
-                Id = app.Id,
-                ListingId = app.ListingId,
-                ApplicantName = app.Owner?.UserName ?? app.CareGiver?.CareGiverName ?? "Unknown",
-                Message = app.Message,
-                Status = app.Status,
-                CreatedAt = app.CreatedAt
-            });
+            var response = applications.Select(MapToResponse);
 
             return Result<IEnumerable<ApplicationResponse>>.Ok(response);
         }
@@ -222,15 +198,31 @@ namespace _4Paws.Services.Application
 
             _db.SaveChanges();
 
-            return Result<ApplicationResponse>.Ok(new ApplicationResponse
+            //return Result<ApplicationResponse>.Ok(new ApplicationResponse
+            //{
+            //    Id = app.Id,
+            //    ListingId = app.ListingId,
+            //    ApplicantName = app.Owner?.User?.FullName ?? app.CareGiver?.CareGiverName ?? "Unknown",
+            //    Message = app.Message,
+            //    Status = app.Status,
+            //    CreatedAt = app.CreatedAt
+            //});
+
+            return Result<ApplicationResponse>.Ok(MapToResponse(app));
+        }
+
+
+        private ApplicationResponse MapToResponse(Models.Application application)
+        {
+            return new ApplicationResponse
             {
-                Id = app.Id,
-                ListingId = app.ListingId,
-                ApplicantName = app.Owner?.User?.FullName ?? app.CareGiver?.CareGiverName ?? "Unknown",
-                Message = app.Message,
-                Status = app.Status,
-                CreatedAt = app.CreatedAt
-            });
+                Id = application.Id,
+                ListingId = application.ListingId,
+                ApplicantName = application.Owner?.User?.FullName ?? application.CareGiver?.CareGiverName ?? "Unknown",
+                Message = application.Message,
+                Status = application.Status,
+                CreatedAt = application.CreatedAt
+            };
         }
     }
 }

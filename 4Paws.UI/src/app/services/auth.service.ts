@@ -46,7 +46,7 @@ export class AuthService {
 
   forgotPassword(email: string): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(
-      `${this.BASE_URL}/fogot-password/${email}`,
+      `${this.BASE_URL}/forgot-password/${email}`,
       {}
     );
   }

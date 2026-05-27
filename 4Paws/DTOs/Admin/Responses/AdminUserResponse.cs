@@ -11,6 +11,8 @@ namespace _4Paws.DTOs.Admin.Responses
         public UserRole Role { get; set; }
         public bool IsVerified { get; set; }
         public bool IsBanned { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool HasOwnerProfile { get; set; }
         public bool HasCareGiverProfile { get; set; }

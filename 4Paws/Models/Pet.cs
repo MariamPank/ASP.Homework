@@ -3,11 +3,12 @@ using _4Paws.Enums;
 
 namespace _4Paws.Models
 {
-    public class Pet :  Entity
+    public class Pet : Entity
     {
         public string PetName { get; set; }
         public Rating PetRating { get; set; }
         public string Description { get; set; }
+        public string? ImageUrl { get; set; }  // ← new
 
         public int OwnerId { get; set; }
         public Owner Owner { get; set; }

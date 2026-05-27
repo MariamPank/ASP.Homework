@@ -1,4 +1,5 @@
-﻿using _4Paws.DTOs.Pet.Requests;
+﻿using _4Paws.Common.Services;
+using _4Paws.DTOs.Pet.Requests;
 using _4Paws.Helper.Owner;
 using _4Paws.Services.Pet;
 using Microsoft.AspNetCore.Authorization;
@@ -12,11 +13,16 @@ namespace _4Paws.Controllers
     {
         private readonly IPetService _petService;
         private readonly ICurrentOwner _currentOwner;
+        private readonly FileUploadService _fileUpload;
 
-        public PetsController(IPetService petService, ICurrentOwner currentOwner)
+        public PetsController(
+            IPetService petService,
+            ICurrentOwner currentOwner,
+            FileUploadService fileUpload)
         {
             _petService = petService;
             _currentOwner = currentOwner;
+            _fileUpload = fileUpload;
         }
 
         [HttpPost]
@@ -54,6 +60,32 @@ namespace _4Paws.Controllers
         public IActionResult Delete(int id)
         {
             var result = _petService.DeletePet(id);
+            return StatusCode(result.Status, result);
+        }
+
+        // PUT /api/Pets/{id}/image
+        // Upload or replace pet image
+        [HttpPut("{id}/image")]
+        public async Task<IActionResult> UploadImage(int id, IFormFile file)
+        {
+            try
+            {
+                var url = await _fileUpload.SaveImageAsync(file, "pets");
+                var result = _petService.UpdatePetImage(id, url, _fileUpload);
+                return StatusCode(result.Status, result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // DELETE /api/Pets/{id}/image
+        // Remove pet image
+        [HttpDelete("{id}/image")]
+        public IActionResult DeleteImage(int id)
+        {
+            var result = _petService.DeletePetImage(id, _fileUpload);
             return StatusCode(result.Status, result);
         }
     }

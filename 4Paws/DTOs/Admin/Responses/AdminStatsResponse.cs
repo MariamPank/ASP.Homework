@@ -13,5 +13,9 @@
         public int ActiveAgreements { get; set; }
         public int CompletedAgreements { get; set; }
         public int BannedUsers { get; set; }
+
+        // ── Soft delete stats ─────────────────────────────────────────────
+        public int DeletedUsers { get; set; }
+        public int DeletedListings { get; set; }
     }
 }

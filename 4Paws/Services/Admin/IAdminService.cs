@@ -10,14 +10,19 @@ namespace _4Paws.Services.Admin
     {
         // ── Users ─────────────────────────────────────────────────────────
         Result<IEnumerable<AdminUserResponse>> GetAllUsers();
+        Result<IEnumerable<AdminUserResponse>> GetDeletedUsers();
         Result<AdminUserResponse> GetUserById(int userId);
         Result<int> DeleteUser(int userId);
+        Result<int> RestoreUser(int userId);
         Result<int> BanUser(int userId);
         Result<int> UnbanUser(int userId);
+        Result<int> ClearUnverifiedUsers();
 
         // ── Listings ──────────────────────────────────────────────────────
         Result<IEnumerable<ListingResponse>> GetAllListings();
+        Result<IEnumerable<ListingResponse>> GetDeletedListings();
         Result<int> DeleteListing(int listingId);
+        Result<int> RestoreListing(int listingId);
 
         // ── Applications ──────────────────────────────────────────────────
         Result<IEnumerable<ApplicationResponse>> GetAllApplications();

@@ -14,6 +14,12 @@
 
             app.UseHttpsRedirection();
 
+            // ── Serve uploaded images as static files ─────────────────────
+            // Files in wwwroot/ are served at their path e.g.:
+            // /uploads/avatars/abc123.jpg
+            // /uploads/pets/def456.png
+            app.UseStaticFiles();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -23,4 +29,3 @@
         }
     }
 }
-

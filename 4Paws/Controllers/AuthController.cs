@@ -1,5 +1,6 @@
 ﻿using _4Paws.DTOs.Auth.Requests;
 using _4Paws.Services.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace _4Paws.Controllers
@@ -35,7 +36,7 @@ namespace _4Paws.Controllers
             return StatusCode(result.Status, result);
         }
 
-        [HttpPost("fogot-password/{email}")]
+        [HttpPost("forgot-password/{email}")]
         public IActionResult ForgotPassword(string email)
         {
             var result = _auth.ForgotPassword(email);
@@ -48,13 +49,6 @@ namespace _4Paws.Controllers
         {
             var result = _auth.ResetPassword(req);
 
-            return StatusCode(result.Status, result);
-        }
-
-        [HttpDelete("clear-unverified")]
-        public IActionResult ClearUnverified()
-        {
-            var result = _auth.ClearUnverifiedUsers();
             return StatusCode(result.Status, result);
         }
     }

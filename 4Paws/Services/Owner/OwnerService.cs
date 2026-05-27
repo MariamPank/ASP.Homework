@@ -1,78 +1,83 @@
 ﻿using _4Paws.Common.Results;
-using _4Paws.Common.Services;
 using _4Paws.Data;
 using _4Paws.DTOs.Owner.Requests;
 using _4Paws.DTOs.Owner.Responses;
-using _4Paws.DTOs.Pet.Responses;
 using _4Paws.Enums;
 using _4Paws.Helper.Owner;
 using _4Paws.Helper.Services;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace _4Paws.Services.Owner
 {
     public class OwnerService : IOwnerService
     {
         private readonly DataContext _db;
-
-        private readonly JwtService _jwt;
         private readonly ICurrentUserService _currentUser;
         private readonly ICurrentOwner _currentOwner;
+        private readonly IMemoryCache _cache;
 
-        public OwnerService(DataContext db, JwtService jwt, ICurrentUserService currentUser, ICurrentOwner currentOwner)
+        private readonly TimeSpan CACHE_TTL = TimeSpan.FromMinutes(5);
+
+        public OwnerService(
+            DataContext db,
+            ICurrentUserService currentUser,
+            ICurrentOwner currentOwner,
+            IMemoryCache cache)
         {
             _db = db;
-            _jwt = jwt;
             _currentUser = currentUser;
             _currentOwner = currentOwner;
+            _cache = cache;
         }
+
         public Result<CreateOwnerProfileResponse> CreateOwnerProfile(CreateOwnerProfileRequest request)
         {
             if (request == null)
                 return Result<CreateOwnerProfileResponse>.BadRequest("Request is null");
 
-            // 1. Get current userId (JWT-დან)
             var userId = _currentUser.CurrentUserId();
 
-            // 2. Check if user exists
             var userExists = _db.Users.Any(x => x.Id == userId);
             if (!userExists)
                 return Result<CreateOwnerProfileResponse>.NotFound("User not found");
 
-            // 3. Check if Owner profile already exists
             var ownerExists = _db.Owners.Any(x => x.UserId == userId);
             if (ownerExists)
                 return Result<CreateOwnerProfileResponse>.BadRequest("Owner profile already exists");
 
-            // 4. Create Owner
             var owner = new Models.Owner
             {
                 UserName = request.UserName,
-                OwnerRating = Rating.Average, // default
+                OwnerRating = Rating.Average,
                 UserId = userId
             };
 
             _db.Owners.Add(owner);
             _db.SaveChanges();
 
-            // 5. Map response
-            var response = new CreateOwnerProfileResponse
+            return Result<CreateOwnerProfileResponse>.Ok(new CreateOwnerProfileResponse
             {
                 Id = owner.Id,
                 UserName = owner.UserName,
                 OwnerRating = owner.OwnerRating,
                 UserId = owner.UserId
-            };
-
-            return Result<CreateOwnerProfileResponse>.Ok(response);
+            });
         }
+
         public Result<GetOwnerByIdResponse> GetOwnerById(int ownerId)
         {
-            var ownerExists = _db.Owners.Any(x => x.Id == ownerId);
+            // ── Cache key scoped to ownerId ───────────────────────────────
+            var cacheKey = $"owner_profile_{ownerId}";
 
+            if (_cache.TryGetValue(cacheKey, out GetOwnerByIdResponse cached))
+                return Result<GetOwnerByIdResponse>.Ok(cached);
+
+            var ownerExists = _db.Owners.Any(x => x.Id == ownerId);
             if (!ownerExists)
                 return Result<GetOwnerByIdResponse>.NotFound("Owner not found");
 
-            var owner = _db.Owners.Where(x => x.Id == ownerId)
+            var owner = _db.Owners
+                .Where(x => x.Id == ownerId)
                 .Select(x => new GetOwnerByIdResponse
                 {
                     Id = x.Id,
@@ -82,12 +87,20 @@ namespace _4Paws.Services.Owner
                 })
                 .FirstOrDefault();
 
+            _cache.Set(cacheKey, owner, CACHE_TTL);
+
             return Result<GetOwnerByIdResponse>.Ok(owner);
         }
+
         public Result<GetOwnerDashboardResponse> GetOwnerDashboard(int ownerId)
         {
-            var ownerExists = _db.Owners.Any(x => x.Id == ownerId);
+            // ── Cache key scoped to ownerId ───────────────────────────────
+            var cacheKey = $"owner_dashboard_{ownerId}";
 
+            if (_cache.TryGetValue(cacheKey, out GetOwnerDashboardResponse cached))
+                return Result<GetOwnerDashboardResponse>.Ok(cached);
+
+            var ownerExists = _db.Owners.Any(x => x.Id == ownerId);
             if (!ownerExists)
                 return Result<GetOwnerDashboardResponse>.NotFound("Owner not found");
 
@@ -102,45 +115,42 @@ namespace _4Paws.Services.Owner
                     TotalPets = x.Pets.Count(),
                     TotalListings = x.Listings.Count(),
                     ActiveListings = x.Listings.Count(l => l.Status == ListingStatus.Open),
-
                     TotalAgreements = x.Agreements.Count(),
                     ActiveAgreements = x.Agreements.Count(a => a.Status == AgreementStatus.Active),
                     CompletedAgreements = x.Agreements.Count(a => a.Status == AgreementStatus.Completed),
 
                     RecentListings = x.Listings
-                        .OrderByDescending(l => l.Id)
-                        .Take(5)
+                        .OrderByDescending(l => l.Id).Take(5)
                         .Select(l => new OwnerListingShortResponse
                         {
                             Id = l.Id,
                             Title = l.Title,
                             Status = l.Status
-                        })
-                        .ToList(),
+                        }).ToList(),
 
                     RecentAgreements = x.Agreements
-                        .OrderByDescending(a => a.Id)
-                        .Take(5)
+                        .OrderByDescending(a => a.Id).Take(5)
                         .Select(a => new OwnerAgreementShortResponse
                         {
                             Id = a.Id,
                             Status = a.Status,
                             PetName = a.Pet.PetName,
                             CareGiverName = a.CareGiver.CareGiverName
-                        })
-                        .ToList()
+                        }).ToList()
                 })
                 .FirstOrDefault();
 
             if (dashboard == null)
                 return Result<GetOwnerDashboardResponse>.NotFound("Owner dashboard not found");
 
+            _cache.Set(cacheKey, dashboard, CACHE_TTL);
+
             return Result<GetOwnerDashboardResponse>.Ok(dashboard);
         }
+
         public Result<List<GetOwnerAgreementsResponse>> GetOwnerAgreements(int ownerId)
         {
             var ownerExists = _db.Owners.Any(x => x.Id == ownerId);
-
             if (!ownerExists)
                 return Result<List<GetOwnerAgreementsResponse>>.NotFound("Owner not found");
 
@@ -160,6 +170,7 @@ namespace _4Paws.Services.Owner
 
             return Result<List<GetOwnerAgreementsResponse>>.Ok(agreements);
         }
+
         public Result<List<GetOwnerListingsResponse>> GetOwnerListings(int ownerId)
         {
             var ownerExists = _db.Owners.Any(x => x.Id == ownerId);
@@ -182,26 +193,11 @@ namespace _4Paws.Services.Owner
             return Result<List<GetOwnerListingsResponse>>.Ok(listings);
         }
 
-        public Result<List<PetResponse>> GetMyPets()
+        // ── Cache invalidation helper — call when owner data changes ──────
+        public void InvalidateOwnerCache(int ownerId)
         {
-            var owner = _currentOwner.GetCurrentOwner();
-
-            if (owner == null)
-                return Result<List<PetResponse>>.NotFound("Owner profile not found");
-
-            var pets = _db.Pets
-                .Where(x => x.OwnerId == owner.Id)
-                .Select(x => new PetResponse
-                {
-                    Id = x.Id,
-                    PetName = x.PetName,
-                    PetRating = x.PetRating,
-                    Description = x.Description,
-                    OwnerId = x.OwnerId
-                })
-                .ToList();
-
-            return Result<List<PetResponse>>.Ok(pets);
+            _cache.Remove($"owner_profile_{ownerId}");
+            _cache.Remove($"owner_dashboard_{ownerId}");
         }
     }
 }

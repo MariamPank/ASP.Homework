@@ -28,7 +28,7 @@ namespace _4Paws.Common.Services
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.UtcNow.AddMinutes(30),
                 signingCredentials: creds
             );
 

@@ -13,10 +13,10 @@ namespace _4Paws.Models
         public bool IsBanned { get; set; } = false;
         public string? VerificationCode { get; set; }
         public UserRole Role { get; set; } = UserRole.User;
+        public string? AvatarUrl { get; set; }  // ← new
 
         public Owner? Owner { get; set; }
         public CareGiver? CareGiver { get; set; }
-
 
         public UserModel() { }
 

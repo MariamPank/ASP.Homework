@@ -5,6 +5,7 @@ using _4Paws.DTOs.Auth.Requests;
 using _4Paws.DTOs.Auth.Responses;
 using _4Paws.Models;
 using _4Paws.Validators.Auth;
+using FluentValidation;
 
 
 namespace _4Paws.Services.Auth
@@ -44,8 +45,7 @@ namespace _4Paws.Services.Auth
             // Pass 'hash' here instead of 'req.Password'
             UserModel user = new UserModel(req.Username, req.Email, hash);
 
-            Random rand = new Random();
-            user.VerificationCode = rand.Next(100_000, 999_999).ToString();
+            user.VerificationCode = Random.Shared.Next(100_000, 999_999).ToString();
 
             _db.Users.Add(user);
             _db.SaveChanges(); // User is now safely in the Database!
@@ -89,6 +89,14 @@ namespace _4Paws.Services.Auth
 
         public Result<TokenResponse> Login(LoginRequest req)
         {
+            LoginValidator validator = new LoginValidator();
+            var result = validator.Validate(req);
+
+            if (!result.IsValid)
+            {
+                var errors = result.Errors.Select(e => e.ErrorMessage).ToList();
+                return Result<TokenResponse>.ValidationError(errors);
+            }
             var user = _db.Users.FirstOrDefault(u => u.Email == req.Email);
 
             if (user == null)
@@ -96,10 +104,12 @@ namespace _4Paws.Services.Auth
             if (!BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
                 return Result<TokenResponse>.BadRequest("email or password is not correct.");
 
+            if (user.IsBanned)
+                return Result<TokenResponse>.BadRequest("Your account has been suspended.");
+
             if (!user.IsVerified)
             {
-                Random rand = new Random();
-                user.VerificationCode = rand.Next(100_000, 999_999).ToString();
+                user.VerificationCode = Random.Shared.Next(100_000, 999_999).ToString();
 
                 _db.SaveChanges();
 
@@ -127,9 +137,7 @@ namespace _4Paws.Services.Auth
             if (!user.IsVerified)
                 return Result<int>.BadRequest("If email exists you will get verification code");
 
-
-            Random rand = new Random();
-            user.VerificationCode = rand.Next(100_000, 999_999).ToString();
+            user.VerificationCode = Random.Shared.Next(100_000, 999_999).ToString();
 
             _db.SaveChanges();
 
@@ -157,22 +165,5 @@ namespace _4Paws.Services.Auth
             return Result<int>.Ok(user.Id);
         }
 
-        public Result<int> ClearUnverifiedUsers()
-        {
-            try
-            {
-                var unverifiedUsers = _db.Users.Where(u => !u.IsVerified).ToList();
-                int count = unverifiedUsers.Count;
-
-                _db.Users.RemoveRange(unverifiedUsers);
-                _db.SaveChanges();
-
-                return Result<int>.Ok(count); // Return how many were deleted
-            }
-            catch (Exception ex)
-            {
-                return Result<int>.BadRequest("Could not clear users: " + ex.Message);
-            }
-        }
     }
 }

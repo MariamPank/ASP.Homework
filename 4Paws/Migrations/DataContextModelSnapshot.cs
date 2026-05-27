@@ -45,8 +45,14 @@ namespace _4Paws.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ListingId")
                         .HasColumnType("int");
@@ -102,6 +108,12 @@ namespace _4Paws.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ListingId")
                         .HasColumnType("int");
@@ -161,6 +173,12 @@ namespace _4Paws.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -170,7 +188,8 @@ namespace _4Paws.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("UserId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("CareGivers");
                 });
@@ -189,6 +208,9 @@ namespace _4Paws.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(2000)
@@ -196,6 +218,9 @@ namespace _4Paws.Migrations
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ListingType")
                         .HasColumnType("int");
@@ -248,6 +273,12 @@ namespace _4Paws.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("OwnerRating")
                         .HasColumnType("int");
 
@@ -264,7 +295,8 @@ namespace _4Paws.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("UserId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Owners");
                 });
@@ -280,10 +312,19 @@ namespace _4Paws.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");
@@ -306,6 +347,63 @@ namespace _4Paws.Migrations
                     b.ToTable("Pets");
                 });
 
+            modelBuilder.Entity("_4Paws.Models.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AgreementId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CareGiverId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("OwnerId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReviewerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgreementId");
+
+                    b.HasIndex("CareGiverId");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("PetId");
+
+                    b.HasIndex("ReviewerId");
+
+                    b.ToTable("Reviews");
+                });
+
             modelBuilder.Entity("_4Paws.Models.UserModel", b =>
                 {
                     b.Property<int>("Id")
@@ -314,7 +412,13 @@ namespace _4Paws.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -328,6 +432,9 @@ namespace _4Paws.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsBanned")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsVerified")
@@ -354,7 +461,8 @@ namespace _4Paws.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Users");
                 });
@@ -488,6 +596,46 @@ namespace _4Paws.Migrations
                         .IsRequired();
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("_4Paws.Models.Review", b =>
+                {
+                    b.HasOne("_4Paws.Models.Agreement", "Agreement")
+                        .WithMany()
+                        .HasForeignKey("AgreementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("_4Paws.Models.CareGiver", "CareGiver")
+                        .WithMany()
+                        .HasForeignKey("CareGiverId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("_4Paws.Models.Owner", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("_4Paws.Models.Pet", "Pet")
+                        .WithMany()
+                        .HasForeignKey("PetId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("_4Paws.Models.UserModel", "Reviewer")
+                        .WithMany()
+                        .HasForeignKey("ReviewerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Agreement");
+
+                    b.Navigation("CareGiver");
+
+                    b.Navigation("Owner");
+
+                    b.Navigation("Pet");
+
+                    b.Navigation("Reviewer");
                 });
 
             modelBuilder.Entity("_4Paws.Models.Application", b =>
