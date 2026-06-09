@@ -8,14 +8,13 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './role-select.component.html',
   styleUrl: './role-select.component.scss',
 })
+
+
 export class RoleSelectComponent {
-  constructor(private router: Router) {}
+  constructor(public router: Router) {}  // make public
 
-  goToOwner() {
-    this.router.navigate(['/owner-dashboard']);
-  }
-
-  goToCaregiver() {
-    this.router.navigate(['/caregiver-dashboard']);
-  }
+  goToOwner()     { this.router.navigate(['/owner-dashboard']); }
+  goToCaregiver() { this.router.navigate(['/caregiver-dashboard']); }
+  goToListings()  { this.router.navigate(['/listings']); }
+  goToProfile()   { this.router.navigate(['/my-profile']); }
 }

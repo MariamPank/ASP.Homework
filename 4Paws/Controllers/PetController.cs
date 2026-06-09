@@ -9,13 +9,13 @@ namespace _4Paws.Controllers
 {
     [Authorize]
     [Route("api/[controller]"), ApiController]
-    public class PetsController : ControllerBase
+    public class PetController : ControllerBase
     {
         private readonly IPetService _petService;
         private readonly ICurrentOwner _currentOwner;
         private readonly FileUploadService _fileUpload;
 
-        public PetsController(
+        public PetController(
             IPetService petService,
             ICurrentOwner currentOwner,
             FileUploadService fileUpload)

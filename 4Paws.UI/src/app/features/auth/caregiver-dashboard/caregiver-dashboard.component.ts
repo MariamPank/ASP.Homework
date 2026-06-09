@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { CaregiverService } from '../../../services/caregiver.service';
 import { AuthService } from '../../../services/auth.service';
-import { CaregiverDashboard, ListingStatus, AgreementStatus } from '../../../models/caregiver.models';
+import { CaregiverDashboard, ListingStatus, AgreementStatus } from '../../../models/feature.models';
 
 @Component({
   selector: 'app-caregiver-dashboard',
@@ -15,7 +15,7 @@ import { CaregiverDashboard, ListingStatus, AgreementStatus } from '../../../mod
 export class CaregiverDashboardComponent implements OnInit {
   private caregiverService = inject(CaregiverService);
   private authService = inject(AuthService);
-  private router = inject(Router);
+  router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   dashboard: CaregiverDashboard | null = null;

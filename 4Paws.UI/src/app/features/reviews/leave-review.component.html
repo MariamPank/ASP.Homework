@@ -1,0 +1,70 @@
+<div class="page-wrapper">
+
+  <div class="hero-bar">
+    <div class="hero-nav">
+      <div class="brand">🐾 4Paws</div>
+      <div class="nav-actions">
+        <button class="btn-ghost" (click)="goBack()">← My Agreements</button>
+        <button class="btn-ghost danger" (click)="logout()">Log out</button>
+      </div>
+    </div>
+    <div class="hero-info">
+      <h2>Leave a Review</h2>
+      <span class="hero-sub">Agreement #{{ agreementId }} · {{ targetName }}</span>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <div class="form-card" *ngIf="!successMessage">
+
+      <div class="field">
+        <label>Your rating</label>
+        <div class="star-row">
+          <span
+            *ngFor="let star of stars"
+            class="star"
+            [class.filled]="isStarFilled(star)"
+            [class.empty]="!isStarFilled(star)"
+            (mouseenter)="hoverStar(star)"
+            (mouseleave)="clearHover()"
+            (click)="setRating(star)">
+            ⭐
+          </span>
+        </div>
+        <span class="rating-label-text">{{ getRatingLabel(form.rating) }}</span>
+      </div>
+
+      <div class="field">
+        <label>Comment <span class="optional">(optional)</span></label>
+        <textarea
+          [(ngModel)]="form.comment"
+          placeholder="Share your experience..."
+          rows="4"
+          maxlength="500">
+        </textarea>
+        <span class="char-count">{{ form.comment.length }} / 500</span>
+      </div>
+
+      <div class="field-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <div class="form-actions">
+        <button class="btn-outline" (click)="goBack()">Cancel</button>
+        <button class="btn-primary" (click)="submit()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Submit review</span>
+          <span *ngIf="isLoading" class="spinner-sm"></span>
+        </button>
+      </div>
+
+    </div>
+
+    <div class="tab-panel" *ngIf="successMessage" style="text-align:center; padding: 3rem 1rem;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">🐾</div>
+      <div class="success-msg">{{ successMessage }}</div>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">
+        Redirecting to agreements...
+      </p>
+    </div>
+
+  </div>
+</div>

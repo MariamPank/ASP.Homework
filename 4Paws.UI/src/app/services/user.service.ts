@@ -1,49 +1,38 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {
-  ChangePasswordRequest,
-  EditUserRequest,
-  UserProfile,
-  ApiResponse,
-} from '../models/user.models';
+import { ApiResponse } from '../models/auth.models';
+import { UserProfile, EditUserRequest, ChangePasswordRequest} from '../models/feature.models';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class UserService {
-  private readonly BASE_URL = 'http://localhost:5281/api/Users';
+  private readonly BASE = 'http://localhost:5281/api/Users';
 
   constructor(private http: HttpClient) {}
 
-  // ─── Get My Profile ──────────────────────────────────────────────────────
-  // Requires: Bearer token in Authorization header (handled by AuthInterceptor)
-
-  getMyProfile(): Observable<ApiResponse<UserProfile>> {
-    return this.http.get<ApiResponse<UserProfile>>(`${this.BASE_URL}/me`);
+  getMe(): Observable<ApiResponse<UserProfile>> {
+    return this.http.get<ApiResponse<UserProfile>>(`${this.BASE}/me`);
   }
 
-  // ─── Change Password ─────────────────────────────────────────────────────
+  editUser(req: EditUserRequest): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(`${this.BASE}/edit`, req);
+  }
 
   changePassword(req: ChangePasswordRequest): Observable<ApiResponse> {
-    return this.http.put<ApiResponse>(
-      `${this.BASE_URL}/change-password`,
-      req
-    );
+    return this.http.put<ApiResponse>(`${this.BASE}/change-password`, req);
   }
 
-  // ─── Edit Profile ────────────────────────────────────────────────────────
-
-  editUser(req: EditUserRequest): Observable<ApiResponse<UserProfile>> {
-    return this.http.put<ApiResponse<UserProfile>>(
-      `${this.BASE_URL}/edit`,
-      req
-    );
+  uploadAvatar(file: File): Observable<ApiResponse<string>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.put<ApiResponse<string>>(`${this.BASE}/avatar`, formData);
   }
 
-  // ─── Delete Account ──────────────────────────────────────────────────────
+  deleteAvatar(): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${this.BASE}/avatar`);
+  }
 
   deleteAccount(): Observable<ApiResponse> {
-    return this.http.delete<ApiResponse>(`${this.BASE_URL}`);
+    return this.http.delete<ApiResponse>(`${this.BASE}`);
   }
 }

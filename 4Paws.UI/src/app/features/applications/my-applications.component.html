@@ -1,0 +1,66 @@
+<div class="page-wrapper">
+
+  <div class="hero-bar">
+    <div class="hero-nav">
+      <div class="brand">🐾 4Paws</div>
+      <div class="nav-actions">
+        <button class="btn-ghost" (click)="goBack()">← Back</button>
+        <button class="btn-ghost danger" (click)="logout()">Log out</button>
+      </div>
+    </div>
+    <div class="hero-info">
+      <h2>My Applications</h2>
+      <span class="hero-sub">Applications you have sent</span>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <div class="loading" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading applications...</p>
+    </div>
+
+    <div class="field-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <div *ngIf="!isLoading">
+
+      <div class="list-header">
+        <span class="list-count">
+          {{ applications.length }} application{{ applications.length !== 1 ? 's' : '' }}
+        </span>
+        <button class="btn-primary" (click)="goBack()">🔍 Browse Listings</button>
+      </div>
+
+      <div class="empty-state" *ngIf="applications.length === 0">
+        <div class="empty-icon">📬</div>
+        <h3>No applications yet</h3>
+        <p>Browse open listings and apply to get started.</p>
+        <button class="btn-primary" (click)="goBack()">Browse Listings</button>
+      </div>
+
+      <div class="apps-list" *ngIf="applications.length > 0">
+        <div class="app-card" *ngFor="let app of applications">
+
+          <div class="app-top">
+            <div class="app-meta">
+              <span class="listing-ref">Listing #{{ app.listingId }}</span>
+              <span class="app-date">{{ formatDate(app.createdAt) }}</span>
+            </div>
+            <span class="status-badge" [ngClass]="getStatusClass(app.status)">
+              {{ getStatusLabel(app.status) }}
+            </span>
+          </div>
+
+          <p class="app-message">"{{ app.message }}"</p>
+
+          <div class="app-fee" *ngIf="app.proposedFee">
+            💰 Proposed fee: <strong>₾{{ app.proposedFee }}</strong>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

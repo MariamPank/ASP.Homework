@@ -1,0 +1,188 @@
+<div class="page-wrapper">
+
+  <!-- Hero bar -->
+  <div class="hero-bar">
+    <div class="hero-nav">
+      <div class="brand">🐾 4Paws</div>
+      <div class="nav-actions">
+        <button class="btn-ghost" (click)="goBack()">← Dashboard</button>
+        <button class="btn-ghost danger" (click)="logout()">Log out</button>
+      </div>
+    </div>
+    <div class="hero-info">
+      <h2>My Listings</h2>
+      <span class="hero-sub">Manage your listings</span>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- Loading -->
+    <div class="loading" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading listings...</p>
+    </div>
+
+    <div *ngIf="!isLoading">
+
+      <!-- Header row -->
+      <div class="list-header">
+        <span class="list-count">{{ listings.length }} listing{{ listings.length !== 1 ? 's' : '' }}</span>
+        <button class="btn-primary" (click)="toggleCreateForm()">
+          {{ showCreateForm ? '✕ Cancel' : '+ New listing' }}
+        </button>
+      </div>
+
+      <!-- Create form -->
+      <div class="form-card" *ngIf="showCreateForm">
+        <h3 class="form-title">📋 New Listing</h3>
+
+        <!-- Type selector -->
+        <div class="field">
+          <label>Listing type</label>
+          <div class="type-toggle">
+            <button type="button"
+              [class.active]="createForm.listingType === ListingType.OwnerNeedsCareGiver"
+              (click)="createForm.listingType = ListingType.OwnerNeedsCareGiver">
+              🏠 Needs CareGiver
+            </button>
+            <button type="button"
+              [class.active]="createForm.listingType === ListingType.CareGiverOffersService"
+              (click)="createForm.listingType = ListingType.CareGiverOffersService">
+              🐶 Offers Service
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Title</label>
+          <input type="text" [(ngModel)]="createForm.title" placeholder="e.g. Need a cat sitter for Luna" />
+        </div>
+
+        <div class="field">
+          <label>Description</label>
+          <textarea [(ngModel)]="createForm.description" rows="4" placeholder="Describe what you need or offer..."></textarea>
+        </div>
+
+        <!-- Pet selector — only for Owner listings -->
+        <div class="field" *ngIf="createForm.listingType === ListingType.OwnerNeedsCareGiver">
+          <label>Select pet</label>
+          <select [(ngModel)]="createForm.petId">
+            <option [ngValue]="undefined">— No pet selected —</option>
+            <option *ngFor="let pet of myPets" [ngValue]="pet.id">{{ pet.petName }}</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Start date</label>
+            <input type="date" [(ngModel)]="createForm.startDate" />
+          </div>
+          <div class="field">
+            <label>End date</label>
+            <input type="date" [(ngModel)]="createForm.endDate" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Proposed budget (₾)</label>
+          <input type="number" [(ngModel)]="createForm.proposedBudget" placeholder="0" min="0" />
+        </div>
+
+        <div class="field-error" *ngIf="createError">{{ createError }}</div>
+        <div class="form-actions">
+          <button class="btn-primary" (click)="createListing()" [disabled]="createLoading">
+            <span *ngIf="!createLoading">Post listing</span>
+            <span *ngIf="createLoading" class="spinner-sm"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="listings.length === 0 && !showCreateForm">
+        <div class="empty-icon">📋</div>
+        <h3>No listings yet</h3>
+        <p>Create your first listing to find caregivers.</p>
+        <button class="btn-primary" (click)="toggleCreateForm()">+ New listing</button>
+      </div>
+
+      <!-- Error -->
+      <div class="field-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <!-- Listing cards -->
+      <div class="listings-list" *ngIf="listings.length > 0">
+        <div class="listing-item" *ngFor="let listing of listings">
+
+          <!-- Edit mode -->
+          <div class="edit-form" *ngIf="editingListing?.id === listing.id">
+            <h3 class="form-title">✏️ Edit listing</h3>
+            <div class="field">
+              <label>Title</label>
+              <input type="text" [(ngModel)]="editForm.title" />
+            </div>
+            <div class="field">
+              <label>Description</label>
+              <textarea [(ngModel)]="editForm.description" rows="3"></textarea>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Start date</label>
+                <input type="date" [(ngModel)]="editForm.startDate" />
+              </div>
+              <div class="field">
+                <label>End date</label>
+                <input type="date" [(ngModel)]="editForm.endDate" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Budget (₾)</label>
+              <input type="number" [(ngModel)]="editForm.proposedBudget" min="0" />
+            </div>
+            <div class="field-error" *ngIf="editError">{{ editError }}</div>
+            <div class="form-actions">
+              <button class="btn-primary" (click)="saveListing()" [disabled]="editLoading">
+                <span *ngIf="!editLoading">Save</span>
+                <span *ngIf="editLoading" class="spinner-sm"></span>
+              </button>
+              <button class="btn-outline" (click)="cancelEdit()">Cancel</button>
+            </div>
+          </div>
+
+          <!-- View mode -->
+          <div class="listing-view" *ngIf="editingListing?.id !== listing.id">
+            <div class="listing-top">
+              <div>
+                <span class="type-badge"
+                  [class.type-owner]="listing.listingType === ListingType.OwnerNeedsCareGiver"
+                  [class.type-cg]="listing.listingType === ListingType.CareGiverOffersService">
+                  {{ getTypeLabel(listing.listingType) }}
+                </span>
+                <span class="status-badge" [ngClass]="getStatusClass(listing.status)">
+                  {{ getStatusLabel(listing.status) }}
+                </span>
+              </div>
+              <span class="listing-budget">₾{{ listing.proposedBudget }}</span>
+            </div>
+            <h3 class="listing-title">{{ listing.title }}</h3>
+            <p class="listing-desc">{{ listing.description }}</p>
+            <div class="listing-dates">
+              📅 {{ formatDate(listing.startDate) }} → {{ formatDate(listing.endDate) }}
+            </div>
+            <div class="listing-actions">
+              <button class="btn-sm outline" (click)="startEdit(listing)"
+                *ngIf="listing.status === ListingStatus.Open">✏️ Edit</button>
+              <button class="btn-sm danger-outline"
+                (click)="deleteListing(listing)"
+                [disabled]="deleteLoading === listing.id">
+                <span *ngIf="deleteLoading !== listing.id">🗑 Delete</span>
+                <span *ngIf="deleteLoading === listing.id" class="spinner-sm"></span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

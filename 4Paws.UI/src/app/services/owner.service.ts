@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {
-  CreateOwnerProfileRequest,
-  OwnerDashboard,
-  ApiResponse,
-} from '../models/owner.models';
+import { OwnerDashboard } from '../models/feature.models';
+import { ApiResponse } from '../models/auth.models';
 
 @Injectable({
   providedIn: 'root',
@@ -14,12 +11,6 @@ export class OwnerService {
   private readonly BASE_URL = 'http://localhost:5281/api/Owner';
 
   constructor(private http: HttpClient) {}
-
-  // ─── Create Owner Profile ─────────────────────────────────────────────────
-
-  createOwnerProfile(req: CreateOwnerProfileRequest): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.BASE_URL}`, req);
-  }
 
   // ─── Get Dashboard ────────────────────────────────────────────────────────
 

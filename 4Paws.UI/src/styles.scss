@@ -1,1 +1,51 @@
-/* You can add global styles to this file, and also import other style files */
+/* ── 4Paws Global Design System ─────────────────────────────────────── */
+
+:root {
+  --primary:        #5B4FCF;
+  --primary-light:  #7C71D8;
+  --primary-bg:     #EAE8FB;
+  --primary-dark:   #3D2DA0;
+
+  --warm:           #D4845A;
+  --warm-bg:        #FDEEDE;
+  --warm-dark:      #8C4A1C;
+
+  --success:        #3BAF82;
+  --success-bg:     #E1F5EE;
+  --success-dark:   #085041;
+
+  --amber:          #F5C842;
+  --amber-bg:       #FEF9DA;
+  --amber-dark:     #8C6A00;
+
+  --danger:         #E05050;
+  --danger-bg:      #FCEBEB;
+  --danger-dark:    #791F1F;
+
+  --page-bg:        #F7F4EF;
+  --card-bg:        #FFFFFF;
+  --border:         #EBEBEB;
+  --border-strong:  #D4D0CC;
+
+  --text-primary:   #1A1A1A;
+  --text-secondary: #64748B;
+  --text-muted:     #9CA3AF;
+
+  --radius-sm:      8px;
+  --radius-md:      12px;
+  --radius-lg:      16px;
+  --radius-xl:      20px;
+  --radius-full:    9999px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--page-bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}

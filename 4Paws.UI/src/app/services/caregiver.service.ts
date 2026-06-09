@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {
-  CreateCaregiverProfileRequest,
-  CaregiverDashboard,
-  ApiResponse,
-} from '../models/caregiver.models';
+import { CaregiverDashboard } from '../models/feature.models';
+import { ApiResponse } from '../models/auth.models';
 
 @Injectable({
   providedIn: 'root',
@@ -14,12 +11,6 @@ export class CaregiverService {
   private readonly BASE_URL = 'http://localhost:5281/api/CareGiver';
 
   constructor(private http: HttpClient) {}
-
-  // ─── Create Caregiver Profile ─────────────────────────────────────────────
-
-  createCaregiverProfile(req: CreateCaregiverProfileRequest): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.BASE_URL}`, req);
-  }
 
   // ─── Get Dashboard ────────────────────────────────────────────────────────
 

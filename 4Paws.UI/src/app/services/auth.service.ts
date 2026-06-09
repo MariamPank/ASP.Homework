@@ -18,31 +18,23 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // ─── Register ────────────────────────────────────────────────────────────
-
   register(req: RegisterRequest): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(`${this.BASE_URL}/register`, req);
   }
 
-  // ─── Login ───────────────────────────────────────────────────────────────
-
   login(req: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.BASE_URL}/login`, req).pipe(
-    tap((res) => {
-      if (res.value?.accessToken) {
-        localStorage.setItem('token', res.value.accessToken);
-      }
-    })
+      tap((res) => {
+        if (res.value?.accessToken) {
+          localStorage.setItem('token', res.value.accessToken);
+        }
+      })
     );
   }
-
-  // ─── Verify Email ────────────────────────────────────────────────────────
 
   verifyEmail(req: VerifyEmailRequest): Observable<ApiResponse> {
     return this.http.put<ApiResponse>(`${this.BASE_URL}/verify-email`, req);
   }
-
-  // ─── Forgot Password ─────────────────────────────────────────────────────
 
   forgotPassword(email: string): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(
@@ -51,13 +43,9 @@ export class AuthService {
     );
   }
 
-  // ─── Reset Password ──────────────────────────────────────────────────────
-
   resetPassword(req: ResetPasswordRequest): Observable<ApiResponse> {
     return this.http.put<ApiResponse>(`${this.BASE_URL}/reset-password`, req);
   }
-
-  // ─── Logout (client-side) ────────────────────────────────────────────────
 
   logout(): void {
     localStorage.removeItem('token');

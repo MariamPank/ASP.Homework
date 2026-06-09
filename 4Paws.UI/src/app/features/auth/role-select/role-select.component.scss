@@ -8,13 +8,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f7f6f2;
+  background: var(--page-bg);
+  background-image: radial-gradient(circle, #D4D0CC 1px, transparent 1px);
+  background-size: 28px 28px;
   padding: 2rem 1rem;
 }
 
 .role-container {
   width: 100%;
-  max-width: 560px;
+  max-width: 580px;
 }
 
 // ── Header ─────────────────────────────────────────────
@@ -24,21 +26,22 @@
   margin-bottom: 2.5rem;
 
   .brand-icon {
-    font-size: 2.5rem;
+    font-size: 3rem;
     margin-bottom: 0.75rem;
+    display: block;
   }
 
   h1 {
-    font-size: 1.75rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--primary);
     margin: 0 0 0.5rem;
     letter-spacing: -0.5px;
   }
 
   p {
     font-size: 0.95rem;
-    color: #888;
+    color: var(--text-secondary);
     margin: 0;
   }
 }
@@ -56,52 +59,97 @@
 }
 
 .role-card {
-  background: #ffffff;
-  border: 1.5px solid #ebebeb;
-  border-radius: 16px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 2rem 1.5rem;
   cursor: pointer;
   transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
   position: relative;
+  overflow: hidden;
+
+  // Subtle colored top accent bar
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--border);
+    transition: background 0.2s;
+  }
+
+  &:first-child::before { background: var(--primary-bg); }
+  &:last-child::before  { background: var(--success-bg); }
 
   &:hover {
-    border-color: #4f46e5;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(91, 79, 207, 0.12);
 
-    .card-arrow {
-      color: #4f46e5;
-      transform: translateX(4px);
+    &:first-child {
+      border-color: var(--primary);
+      &::before { background: var(--primary); }
+      .card-arrow { color: var(--primary); transform: translateX(4px); }
+    }
+
+    &:last-child {
+      border-color: var(--success);
+      &::before { background: var(--success); }
+      .card-arrow { color: var(--success); transform: translateX(4px); }
     }
   }
 
-  &:active {
-    transform: translateY(0);
-  }
+  &:active { transform: translateY(0); }
 
   .card-icon {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     margin-bottom: 1rem;
+    display: block;
   }
 
   h2 {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--text-primary);
     margin: 0 0 0.5rem;
   }
 
   p {
     font-size: 0.85rem;
-    color: #888;
-    line-height: 1.5;
+    color: var(--text-secondary);
+    line-height: 1.6;
     margin: 0 0 1.25rem;
   }
 
   .card-arrow {
     font-size: 1.1rem;
-    color: #ccc;
+    color: var(--text-muted);
     transition: color 0.2s, transform 0.2s;
     display: inline-block;
+  }
+}
+
+.bottom-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+
+  button {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.55rem 1.1rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+
+    &:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
   }
 }

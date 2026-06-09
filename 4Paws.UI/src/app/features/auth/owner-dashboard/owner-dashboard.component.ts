@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { OwnerService } from '../../../services/owner.service';
 import { AuthService } from '../../../services/auth.service';
-import { OwnerDashboard, Rating, ListingStatus, AgreementStatus } from '../../../models/owner.models';
+import { OwnerDashboard, Rating, ListingStatus, AgreementStatus } from '../../../models/feature.models';
 
 @Component({
   selector: 'app-owner-dashboard',
@@ -15,7 +15,7 @@ import { OwnerDashboard, Rating, ListingStatus, AgreementStatus } from '../../..
 export class OwnerDashboardComponent implements OnInit {
   private ownerService = inject(OwnerService);
   private authService = inject(AuthService);
-  private router = inject(Router);
+  router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   dashboard: OwnerDashboard | null = null;

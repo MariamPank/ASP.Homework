@@ -1,0 +1,61 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <div class="brand">
+      <span class="brand-icon">📬</span>
+      <h1>Check your email</h1>
+      <p>Enter the 6-digit code we sent you</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          name="email"
+          [(ngModel)]="form.email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        />
+      </div>
+
+      <div class="field">
+        <label for="code">Verification code</label>
+        <input
+          id="code"
+          type="text"
+          name="code"
+          [(ngModel)]="form.code"
+          placeholder="123456"
+          maxlength="6"
+          class="code-input"
+          autocomplete="one-time-code"
+          required
+        />
+        <span class="field-hint">Check your inbox — the code expires soon.</span>
+      </div>
+
+      <div class="error-msg" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="success-msg" *ngIf="successMessage">
+        ✅ {{ successMessage }}
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Verify email</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+
+    </form>
+
+    <p class="alt-link">
+      Back to <a routerLink="/login">Sign in</a>
+    </p>
+
+  </div>
+</div>

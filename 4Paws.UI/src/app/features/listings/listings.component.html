@@ -1,0 +1,193 @@
+<div class="listings-wrapper">
+
+  <!-- ── Top Bar ──────────────────────────────────────────────────────── -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="btn-back" (click)="goBack()">← Back</button>
+      <div class="brand">🐾 4Paws</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-logout" (click)="logout()">Log out</button>
+    </div>
+  </div>
+
+  <!-- ── Hero ─────────────────────────────────────────────────────────── -->
+  <div class="hero">
+    <h1>Find Pet Care</h1>
+    <p>Browse listings from owners needing care or caregivers offering services</p>
+  </div>
+
+  <!-- ── Filters ──────────────────────────────────────────────────────── -->
+  <div class="filters-bar">
+    <div class="filter-group search-group">
+      <span class="filter-icon">🔍</span>
+      <input type="text" placeholder="Search listings..."
+        [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()" class="search-input" />
+    </div>
+    <div class="filter-group">
+      <select [(ngModel)]="selectedType" (ngModelChange)="applyFilters()" class="filter-select">
+        <option value="all">All Types</option>
+        <option value="1">🏠 Needs CareGiver</option>
+        <option value="2">🐶 Offers Service</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <input type="number" placeholder="Max budget (₾)"
+        [(ngModel)]="maxBudget" (ngModelChange)="applyFilters()" class="filter-input" min="0" />
+    </div>
+    <div class="filter-group">
+      <select [(ngModel)]="sortBy" (ngModelChange)="applyFilters()" class="filter-select">
+        <option value="newest">Newest First</option>
+        <option value="budget-asc">Budget: Low → High</option>
+        <option value="budget-desc">Budget: High → Low</option>
+      </select>
+    </div>
+    <button class="btn-clear" (click)="clearFilters()">Clear</button>
+  </div>
+
+  <!-- ── Results count ────────────────────────────────────────────────── -->
+  <div class="results-bar" *ngIf="!isLoading">
+    <span class="results-count">
+      {{ filteredListings.length }} listing{{ filteredListings.length !== 1 ? 's' : '' }} found
+    </span>
+  </div>
+
+  <!-- ── Loading ──────────────────────────────────────────────────────── -->
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading listings...</p>
+  </div>
+
+  <!-- ── Error ────────────────────────────────────────────────────────── -->
+  <div class="error-msg" *ngIf="errorMessage && !isLoading">{{ errorMessage }}</div>
+
+  <!-- ── Empty state ──────────────────────────────────────────────────── -->
+  <div class="empty-state" *ngIf="!isLoading && !errorMessage && filteredListings.length === 0">
+    <div class="empty-icon">🐾</div>
+    <h3>No listings found</h3>
+    <p>Try adjusting your filters or check back later.</p>
+    <button class="btn-clear-alt" (click)="clearFilters()">Clear Filters</button>
+  </div>
+
+  <!-- ── Listings Grid ────────────────────────────────────────────────── -->
+  <div class="listings-grid" *ngIf="!isLoading && filteredListings.length > 0">
+
+    <div class="listing-card" *ngFor="let listing of filteredListings">
+
+      <div class="card-header">
+        <span class="type-badge" [ngClass]="getTypeClass(listing.listingType)">
+          {{ listing.listingType === ListingType.OwnerNeedsCareGiver ? '🏠 Needs CareGiver' : '🐶 Offers Service' }}
+        </span>
+        <span class="days-left" *ngIf="getDaysLeft(listing.endDate) > 0">
+          {{ getDaysLeft(listing.endDate) }} days left
+        </span>
+        <span class="days-left expired" *ngIf="getDaysLeft(listing.endDate) === 0">
+          Ending today
+        </span>
+      </div>
+
+      <div class="card-body">
+        <h3 class="listing-title">{{ listing.title }}</h3>
+        <p class="listing-desc">{{ listing.description }}</p>
+        <div class="pet-tag" *ngIf="listing.petName">🐱 {{ listing.petName }}</div>
+      </div>
+
+      <div class="card-footer">
+        <div class="footer-dates">
+          <span class="date-label">📅 {{ formatDate(listing.startDate) }}</span>
+          <span class="date-sep">→</span>
+          <span class="date-label">{{ formatDate(listing.endDate) }}</span>
+        </div>
+        <span class="budget-amount">₾{{ listing.proposedBudget }}</span>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn-apply" (click)="openApply(listing)">Apply</button>
+        <button class="btn-view-apps" (click)="openViewApplications(listing)">
+          View Applications
+        </button>
+        <button class="btn-view-profile"
+          *ngIf="listing.ownerId"
+          (click)="router.navigate(['/public-profile/owner/' + listing.ownerId])">
+          👤 Owner Profile
+        </button>
+        <button class="btn-view-profile"
+          *ngIf="listing.careGiverId"
+          (click)="router.navigate(['/public-profile/caregiver/' + listing.careGiverId])">
+          👤 CareGiver Profile
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Apply Modal ───────────────────────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="applyListing" (click)="closeApply()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Apply to Listing</div>
+        <div class="modal-sub">{{ applyListing!.title }}</div>
+      </div>
+      <button class="modal-close" (click)="closeApply()">✕</button>
+    </div>
+
+    <div class="modal-body" *ngIf="!applySuccess">
+      <div class="field">
+        <label>Message <span class="req">*</span></label>
+        <textarea
+          [(ngModel)]="applyForm.message"
+          placeholder="Hi, I'd love to help care for your pet! I have experience with..."
+          rows="4"
+          maxlength="1500">
+        </textarea>
+        <span class="char-count">{{ applyForm.message.length }} / 1500</span>
+      </div>
+      <div class="field">
+        <label>Proposed fee (₾) <span class="optional">optional</span></label>
+        <input type="number" [(ngModel)]="applyForm.proposedFee"
+          placeholder="e.g. 80" min="0" />
+      </div>
+      <div class="field-error" *ngIf="applyError">{{ applyError }}</div>
+    </div>
+
+    <div class="modal-success" *ngIf="applySuccess">
+      {{ applySuccess }}
+    </div>
+
+    <div class="modal-footer" *ngIf="!applySuccess">
+      <button class="btn-outline" (click)="closeApply()">Cancel</button>
+      <button class="btn-primary" (click)="submitApply()" [disabled]="applyLoading">
+        <span *ngIf="!applyLoading">Send application</span>
+        <span *ngIf="applyLoading" class="spinner-sm"></span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── View Applications Modal ───────────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="viewListing" (click)="closeViewApplications()">
+  <div class="modal modal-wide" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Applications</div>
+        <div class="modal-sub">{{ viewListing!.title }}</div>
+      </div>
+      <button class="modal-close" (click)="closeViewApplications()">✕</button>
+    </div>
+
+    <div class="modal-loading" *ngIf="viewLoading">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="modal-body" *ngIf="!viewLoading">
+
+      <div class="status-success" *ngIf="statusSuccess">{{ statusSuccess }}</div>
+
+      <div class="modal-empty" *ngIf="viewApplications.length === 0">
+        📬 No applicati

@@ -1,11 +1,9 @@
 // ─── Auth Request Models ───────────────────────────────────────────────────
 
 export interface RegisterRequest {
-  firstName: string;
-  lastName: string;
+  username: string;
   email: string;
   password: string;
-  confirmPassword: string;
 }
 
 export interface LoginRequest {
@@ -15,14 +13,17 @@ export interface LoginRequest {
 
 export interface VerifyEmailRequest {
   email: string;
-  token: string;
+  code: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
 }
 
 export interface ResetPasswordRequest {
   email: string;
-  token: string;
-  newPassword: string;
-  confirmNewPassword: string;
+  code: string;
+  password: string;
 }
 
 // ─── Auth Response Models ──────────────────────────────────────────────────
@@ -38,6 +39,7 @@ export interface AuthResponse {
 
 export interface ApiResponse<T = any> {
   status: number;
-  message: string;
-  data?: T;
+  message: string | null;
+  errors: string | null;
+  value?: T;
 }

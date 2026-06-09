@@ -1,0 +1,81 @@
+<div class="page-wrapper">
+
+  <div class="hero-bar">
+    <div class="hero-nav">
+      <div class="brand">🐾 4Paws</div>
+      <div class="nav-actions">
+        <button class="btn-ghost" (click)="goBack()">← Listings</button>
+        <button class="btn-ghost danger" (click)="logout()">Log out</button>
+      </div>
+    </div>
+    <div class="hero-info">
+      <h2>{{ profileType === 'owner' ? 'Owner' : 'Caregiver' }} Profile</h2>
+      <span class="hero-sub">Public profile & reviews</span>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <div class="loading" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading profile...</p>
+    </div>
+
+    <div class="field-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <div *ngIf="!isLoading && !errorMessage">
+
+      <!-- Profile header card -->
+      <div class="profile-header-card">
+        <div class="profile-avatar-circle">
+          {{ profileName.charAt(0).toUpperCase() }}
+        </div>
+        <div class="profile-meta">
+          <div class="profile-name">{{ profileName }}</div>
+          <div class="profile-rating-row">
+            <span class="profile-stars">{{ getStars(profileRating) }}</span>
+            <span class="profile-rating-label">{{ getRatingLabel(profileRating) }}</span>
+          </div>
+          <div class="review-count">
+            {{ reviews.length }} review{{ reviews.length !== 1 ? 's' : '' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews section -->
+      <div class="section">
+        <div class="section-header">
+          <h2><span class="section-icon">⭐</span> Reviews</h2>
+        </div>
+
+        <div class="no-reviews" *ngIf="reviews.length === 0">
+          No reviews yet for this profile.
+        </div>
+
+        <div class="reviews-list" *ngIf="reviews.length > 0">
+          <div class="review-card" *ngFor="let review of reviews">
+
+            <div class="review-top">
+              <span class="review-stars">{{ getStars(review.rating) }}</span>
+              <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+            </div>
+
+            <div class="reviewer-name">👤 {{ review.reviewerName }}</div>
+
+            <p class="review-comment" *ngIf="review.comment">
+              "{{ review.comment }}"
+            </p>
+
+            <p class="review-comment" *ngIf="!review.comment"
+              style="color: var(--text-muted); font-style: normal;">
+              No comment left.
+            </p>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

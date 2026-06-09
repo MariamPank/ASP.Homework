@@ -1,0 +1,101 @@
+<div class="page-wrapper">
+
+  <div class="hero-bar">
+    <div class="hero-nav">
+      <div class="brand">🐾 4Paws</div>
+      <div class="nav-actions">
+        <button class="btn-ghost" (click)="goBack()">← Back</button>
+        <button class="btn-ghost danger" (click)="logout()">Log out</button>
+      </div>
+    </div>
+    <div class="hero-info">
+      <h2>My Agreements</h2>
+      <span class="hero-sub">Your active and completed agreements</span>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <div class="loading" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading agreements...</p>
+    </div>
+
+    <div class="field-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <div *ngIf="!isLoading">
+
+      <div class="list-header">
+        <span class="list-count">
+          {{ agreements.length }} agreement{{ agreements.length !== 1 ? 's' : '' }}
+        </span>
+      </div>
+
+      <div class="global-success" *ngIf="completeSuccess">{{ completeSuccess }}</div>
+      <div class="global-error"   *ngIf="completeError">{{ completeError }}</div>
+
+      <div class="empty-state" *ngIf="agreements.length === 0">
+        <div class="empty-icon">🤝</div>
+        <h3>No agreements yet</h3>
+        <p>Agreements are created when an application is accepted.</p>
+        <button class="btn-primary" (click)="router.navigate(['/listings'])">Browse Listings</button>
+      </div>
+
+      <div class="agreements-list" *ngIf="agreements.length > 0">
+        <div class="agreement-card" *ngFor="let ag of agreements">
+
+          <div class="agreement-top">
+            <span class="agreement-id">Agreement #{{ ag.id }}</span>
+            <span class="status-badge" [ngClass]="getStatusClass(ag.status)">
+              {{ getStatusLabel(ag.status) }}
+            </span>
+          </div>
+
+          <div class="agreement-body">
+            <div class="info-row">
+              <span class="info-label">Start date</span>
+              <span class="info-value">📅 {{ formatDate(ag.startDate) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">End date</span>
+              <span class="info-value">📅 {{ formatDate(ag.endDate) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Agreed fee</span>
+              <span class="fee-value">₾{{ ag.agreedFee }}</span>
+            </div>
+            <div class="info-row" *ngIf="ag.completeAt">
+              <span class="info-label">Completed on</span>
+              <span class="info-value">🏆 {{ formatDate(ag.completeAt) }}</span>
+            </div>
+          </div>
+
+          <div class="agreement-footer">
+            <span class="completed-at" *ngIf="ag.status !== AgreementStatus.Completed">
+              Owner marks as complete when service is done
+            </span>
+            <span class="completed-at" *ngIf="ag.status === AgreementStatus.Completed">
+              ✅ Service completed
+            </span>
+            <button
+              class="btn-complete"
+              *ngIf="ag.status === AgreementStatus.Active"
+              (click)="complete(ag)"
+              [disabled]="completeLoading === ag.id">
+              <span *ngIf="completeLoading !== ag.id">🏁 Mark Complete</span>
+              <span *ngIf="completeLoading === ag.id" class="spinner-sm"></span>
+            </button>
+          </div>
+
+          <button class="btn-sm outline"
+            *ngIf="ag.status === AgreementStatus.Completed"
+            (click)="leaveReview(ag)">
+            ⭐ Leave Review
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
