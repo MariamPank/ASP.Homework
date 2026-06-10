@@ -109,7 +109,7 @@ namespace _4Paws.Services.Pet
 
         // ── Image ─────────────────────────────────────────────────────────
 
-        public Result<string> UpdatePetImage(int petId, string imageUrl, FileUploadService fileUpload)
+        public Result<string> UpdatePetImage(int petId, string imageUrl)
         {
             var owner = _currentOwner.GetCurrentOwner();
             if (owner == null)
@@ -119,16 +119,13 @@ namespace _4Paws.Services.Pet
             if (pet == null)
                 return Result<string>.NotFound("Pet not found");
 
-            // Delete old image if one exists
-            fileUpload.DeleteImage(pet.ImageUrl);
-
             pet.ImageUrl = imageUrl;
             _db.SaveChanges();
 
             return Result<string>.Ok(imageUrl);
         }
 
-        public Result<int> DeletePetImage(int petId, FileUploadService fileUpload)
+        public Result<int> DeletePetImage(int petId)
         {
             var owner = _currentOwner.GetCurrentOwner();
             if (owner == null)
@@ -138,7 +135,6 @@ namespace _4Paws.Services.Pet
             if (pet == null)
                 return Result<int>.NotFound("Pet not found");
 
-            fileUpload.DeleteImage(pet.ImageUrl);
             pet.ImageUrl = null;
             _db.SaveChanges();
 

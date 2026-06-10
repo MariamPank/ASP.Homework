@@ -149,7 +149,7 @@ export class MyPetsComponent implements OnInit {
   }
 
   getImageUrl(pet: Pet): string {
-    return pet.imageUrl ? `${this.BASE_URL}${pet.imageUrl}` : '';
+    return pet.imageUrl || '';
   }
 
   getRatingLabel(r: number): string {

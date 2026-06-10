@@ -12,7 +12,7 @@ namespace _4Paws.Services.Pet
         Result<List<PetResponse>> GetMyPets();
         Result<PetResponse> UpdatePet(int petId, UpdatePetRequest request);
         Result<int> DeletePet(int petId);
-        Result<string> UpdatePetImage(int petId, string imageUrl, FileUploadService fileUpload);
-        Result<int> DeletePetImage(int petId, FileUploadService fileUpload);
+        Result<string> UpdatePetImage(int petId, string imageUrl);
+        Result<int> DeletePetImage(int petId);
     }
 }

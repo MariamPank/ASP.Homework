@@ -45,7 +45,6 @@ namespace _4Paws.Services.CareGiver
 
             var caregiver = new Models.CareGiver
             {
-                CareGiverName = request.UserName,
                 CareGiverRating = Rating.Average,
                 UserId = userId,
                 Bio = request.Bio,
@@ -57,7 +56,6 @@ namespace _4Paws.Services.CareGiver
             return Result<CreateCaregiverProfileResponse>.Ok(new CreateCaregiverProfileResponse
             {
                 Id = caregiver.Id,
-                UserName = caregiver.CareGiverName,
                 CaregiverRating = caregiver.CareGiverRating,
                 UserId = caregiver.UserId
             });
@@ -80,7 +78,7 @@ namespace _4Paws.Services.CareGiver
                 .Select(x => new GetCaregiverByIdResponse
                 {
                     Id = x.Id,
-                    UserName = x.CareGiverName,
+                    UserName = x.User.FullName,
                     CaregiverRating = x.CareGiverRating,
                     UserId = x.UserId
                 })
@@ -100,13 +98,13 @@ namespace _4Paws.Services.CareGiver
                 return Result<GetCaregiverDashboardResponse>.Ok(cached);
 
             var dashboard = _db.CareGivers
+                .Include(x => x.User)
                 .Where(x => x.Id == caregiverId)
                 .Select(x => new GetCaregiverDashboardResponse
                 {
                     CaregiverId = x.Id,
-                    UserName = x.CareGiverName,
+                    UserName = x.User.FullName,
                     CaregiverRating = x.CareGiverRating,
-
                     TotalListings = x.Listings.Count(),
                     ActiveListings = x.Listings.Count(l => l.Status == ListingStatus.Open),
                     TotalAgreements = x.Agreements.Count(),
@@ -129,7 +127,7 @@ namespace _4Paws.Services.CareGiver
                             Id = a.Id,
                             Status = a.Status,
                             PetName = a.Pet.PetName,
-                            OwnerName = a.Owner.UserName
+                            OwnerName = a.Owner.User.FullName
                         }).ToList()
                 })
                 .FirstOrDefault();
@@ -157,7 +155,7 @@ namespace _4Paws.Services.CareGiver
                     StartDate = x.StartDate,
                     EndDate = x.EndDate,
                     AgreedFee = x.AgreedFee,
-                    OwnerName = x.Owner.UserName,
+                    OwnerName = x.Owner.User.FullName,
                     PetName = x.Pet.PetName
                 })
                 .ToList();

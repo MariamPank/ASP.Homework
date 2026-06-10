@@ -5,7 +5,6 @@ namespace _4Paws.Models
 {
     public class Owner : Entity
     {
-        public string UserName { get; set; }
         public Rating OwnerRating { get; set; }
 
         public int UserId { get; set; }

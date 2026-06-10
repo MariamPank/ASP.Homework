@@ -1,6 +1,7 @@
 ﻿using _4Paws.Common.Services;
 using _4Paws.DTOs.Pet.Requests;
 using _4Paws.Helper.Owner;
+using _4Paws.Services.Images;
 using _4Paws.Services.Pet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,16 +14,16 @@ namespace _4Paws.Controllers
     {
         private readonly IPetService _petService;
         private readonly ICurrentOwner _currentOwner;
-        private readonly FileUploadService _fileUpload;
+        private readonly CloudinaryService _cloudinaryService;
 
         public PetController(
             IPetService petService,
             ICurrentOwner currentOwner,
-            FileUploadService fileUpload)
+            CloudinaryService cloudinaryService)
         {
             _petService = petService;
             _currentOwner = currentOwner;
-            _fileUpload = fileUpload;
+            _cloudinaryService = cloudinaryService;
         }
 
         [HttpPost]
@@ -70,8 +71,9 @@ namespace _4Paws.Controllers
         {
             try
             {
-                var url = await _fileUpload.SaveImageAsync(file, "pets");
-                var result = _petService.UpdatePetImage(id, url, _fileUpload);
+                var url = await _cloudinaryService.UploadImageAsync(file);
+
+                var result = _petService.UpdatePetImage(id, url);
                 return StatusCode(result.Status, result);
             }
             catch (Exception ex)
@@ -85,7 +87,7 @@ namespace _4Paws.Controllers
         [HttpDelete("{id}/image")]
         public IActionResult DeleteImage(int id)
         {
-            var result = _petService.DeletePetImage(id, _fileUpload);
+            var result = _petService.DeletePetImage(id);
             return StatusCode(result.Status, result);
         }
     }

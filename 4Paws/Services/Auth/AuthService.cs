@@ -18,7 +18,7 @@ namespace _4Paws.Services.Auth
 
         private readonly JwtService _jwt;
 
-        public AuthService (DataContext db, SmtpService smtp, JwtService jwt)
+        public AuthService(DataContext db, SmtpService smtp, JwtService jwt)
         {
             _db = db;
             _smtp = smtp;
@@ -48,6 +48,26 @@ namespace _4Paws.Services.Auth
             user.VerificationCode = Random.Shared.Next(100_000, 999_999).ToString();
 
             _db.Users.Add(user);
+
+            _db.Owners.Add(new Models.Owner
+            {
+                IsDeleted = false,
+                UpdatedAt = DateTime.Now,
+                OwnerRating = Enums.Rating.Average,
+                CreatedAt = DateTime.Now,
+                User = user
+            });
+
+            _db.CareGivers.Add(new Models.CareGiver
+            {
+                IsDeleted = false,
+                UpdatedAt = DateTime.Now,
+                CareGiverRating = Enums.Rating.Average,
+                Bio = string.Empty,
+                CreatedAt = DateTime.Now,
+                User = user
+            });
+
             _db.SaveChanges(); // User is now safely in the Database!
 
             // 2. FIXED: Wrap the email in a try-catch so it doesn't crash the request

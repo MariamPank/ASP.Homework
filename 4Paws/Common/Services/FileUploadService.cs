@@ -22,7 +22,7 @@
                 throw new Exception("File size must be under 5MB.");
 
             // Ensure wwwroot/uploads/{folder} exists
-            var uploadPath = Path.Combine(_env.WebRootPath, "uploads", folder);
+            var uploadPath = Path.Combine(_env.ContentRootPath, "uploads", folder);
             Directory.CreateDirectory(uploadPath);
 
             // Use a GUID filename to prevent collisions and hide original name

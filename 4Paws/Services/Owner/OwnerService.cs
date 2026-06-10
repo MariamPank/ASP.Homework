@@ -5,6 +5,7 @@ using _4Paws.DTOs.Owner.Responses;
 using _4Paws.Enums;
 using _4Paws.Helper.Owner;
 using _4Paws.Helper.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace _4Paws.Services.Owner
@@ -47,7 +48,6 @@ namespace _4Paws.Services.Owner
 
             var owner = new Models.Owner
             {
-                UserName = request.UserName,
                 OwnerRating = Rating.Average,
                 UserId = userId
             };
@@ -58,7 +58,6 @@ namespace _4Paws.Services.Owner
             return Result<CreateOwnerProfileResponse>.Ok(new CreateOwnerProfileResponse
             {
                 Id = owner.Id,
-                UserName = owner.UserName,
                 OwnerRating = owner.OwnerRating,
                 UserId = owner.UserId
             });
@@ -81,7 +80,7 @@ namespace _4Paws.Services.Owner
                 .Select(x => new GetOwnerByIdResponse
                 {
                     Id = x.Id,
-                    UserName = x.UserName,
+                    UserName = x.User.FullName,
                     OwnerRating = x.OwnerRating,
                     UserId = x.UserId
                 })
@@ -105,11 +104,12 @@ namespace _4Paws.Services.Owner
                 return Result<GetOwnerDashboardResponse>.NotFound("Owner not found");
 
             var dashboard = _db.Owners
+                .Include(x => x.User)
                 .Where(x => x.Id == ownerId)
                 .Select(x => new GetOwnerDashboardResponse
                 {
                     OwnerId = x.Id,
-                    UserName = x.UserName,
+                    UserName = x.User.FullName,
                     OwnerRating = x.OwnerRating,
 
                     TotalPets = x.Pets.Count(),
@@ -135,7 +135,7 @@ namespace _4Paws.Services.Owner
                             Id = a.Id,
                             Status = a.Status,
                             PetName = a.Pet.PetName,
-                            CareGiverName = a.CareGiver.CareGiverName
+                            CareGiverName = a.CareGiver.User.FullName
                         }).ToList()
                 })
                 .FirstOrDefault();
@@ -163,7 +163,7 @@ namespace _4Paws.Services.Owner
                     StartDate = x.StartDate,
                     EndDate = x.EndDate,
                     AgreedFee = x.AgreedFee,
-                    CareGiverName = x.CareGiver.CareGiverName,
+                    CareGiverName = x.CareGiver.User.FullName,
                     PetName = x.Pet.PetName
                 })
                 .ToList();

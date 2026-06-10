@@ -41,7 +41,7 @@ namespace _4Paws.Services.Application
                     return Result<ApplicationResponse>.BadRequest("You need a Caregiver profile to apply for this job.");
 
                 applicantCareGiverId = careGiver.Id;
-                applicantName = careGiver.CareGiverName; 
+                applicantName = careGiver.User.FullName; 
             }
             else
             {
@@ -218,7 +218,7 @@ namespace _4Paws.Services.Application
             {
                 Id = application.Id,
                 ListingId = application.ListingId,
-                ApplicantName = application.Owner?.User?.FullName ?? application.CareGiver?.CareGiverName ?? "Unknown",
+                ApplicantName = application.Owner?.User?.FullName ?? application.CareGiver?.User.FullName ?? "Unknown",
                 Message = application.Message,
                 Status = application.Status,
                 CreatedAt = application.CreatedAt

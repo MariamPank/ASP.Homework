@@ -11,6 +11,7 @@ using _4Paws.Services.Agreement;
 using _4Paws.Services.Application;
 using _4Paws.Services.Auth;
 using _4Paws.Services.CareGiver;
+using _4Paws.Services.Images;
 using _4Paws.Services.Listing;
 using _4Paws.Services.Owner;
 using _4Paws.Services.Pet;
@@ -75,6 +76,7 @@ namespace _4Paws.Extensions
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<IAdministrator, Administrator>();
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
+            services.AddSingleton(new CloudinaryService());
 
             services.AddScoped<SmtpService>();
             services.AddScoped<JwtService>();

@@ -5,7 +5,6 @@ namespace _4Paws.Models
 {
     public class CareGiver : Entity
     {
-        public string CareGiverName { get; set; }
         public Rating CareGiverRating { get; set; }
         public string Bio { get; set; }
 

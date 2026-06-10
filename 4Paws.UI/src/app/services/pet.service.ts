@@ -30,13 +30,13 @@ export class PetService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.put<ApiResponse<string>>(
-      `http://localhost:5281/api/Pets/${id}/image`, formData
+      `http://localhost:5281/api/Pet/${id}/image`, formData
     );
   }
 
   deleteImage(id: number): Observable<ApiResponse> {
     return this.http.delete<ApiResponse>(
-      `http://localhost:5281/api/Pets/${id}/image`
+      `http://localhost:5281/api/Pet/${id}/image`
     );
   }
 }
