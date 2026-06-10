@@ -23,14 +23,15 @@ export class AuthService {
   }
 
   login(req: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.BASE_URL}/login`, req).pipe(
-      tap((res) => {
-        if (res.value?.accessToken) {
-          localStorage.setItem('token', res.value.accessToken);
-        }
-      })
-    );
-  }
+  return this.http.post<AuthResponse>(`${this.BASE_URL}/login`, req).pipe(
+    tap((res) => {
+      if (res.value?.accessToken && res.value.accessToken !== 'Verification') {
+        localStorage.setItem('token', res.value.accessToken);
+      }
+    })
+  );
+}
+  
 
   verifyEmail(req: VerifyEmailRequest): Observable<ApiResponse> {
     return this.http.put<ApiResponse>(`${this.BASE_URL}/verify-email`, req);

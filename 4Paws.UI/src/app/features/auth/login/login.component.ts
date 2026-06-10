@@ -39,19 +39,20 @@ export class LoginComponent {
     this.errorMessage = '';
 
     this.authService.login(this.form).subscribe({
-     next: (res) => {
-      this.isLoading = false;
-      if (res.value?.accessToken) {
-        this.router.navigate(['/profile']);
-      } else {
-        this.errorMessage = res.message || 'Login failed.';
-      }
-      },
-    error: (err) => {
+      next: (res) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Login failed. Please try again.';
-    },
+        if (res.value?.accessToken === 'Verification') {
+          // User exists but email not verified — send them to verify
+          this.router.navigate(['/verify-email'], {
+            queryParams: { email: this.form.email },
+          });
+        } else if (res.value?.accessToken) {
+          // Real token — logged in successfully
+          this.router.navigate(['/profile']);
+        } else {
+          this.errorMessage = res.message || 'Login failed.';
+        }
+      },
     });
   }
 }
-
