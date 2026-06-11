@@ -8,9 +8,9 @@ namespace _4Paws.Models
         public AgreementStatus Status { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         public decimal AgreedFee { get; set; }
-        public DateTime CompleteAt { get; set; }
+        public DateTime? CompleteAt { get; set; }
 
         public int OwnerId { get; set; }
         public Owner Owner { get; set; }

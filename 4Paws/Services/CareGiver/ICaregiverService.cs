@@ -11,5 +11,6 @@ namespace _4Paws.Services.CareGiver
         Result<GetCaregiverDashboardResponse> GetCaregiverDashboard(int caregiverId);
         Result<List<GetCaregiverListingsResponse>> GetCaregiverListings(int caregiverId);
         Result<List<GetCaregiverAgreementsResponse>> GetCaregiverAgreements(int caregiverId);
+        Result<int> UpdateBio(int careGiverId, string bio);
     }
 }

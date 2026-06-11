@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { UserService } from '../../services/user.service';
-import { ProfileService } from '../../services/profile.service';
 import { AuthService } from '../../services/auth.service';
+import { CaregiverService } from '../../services/caregiver.service';
 import { UserProfile } from '../../models/feature.models';
 
-type ActiveTab = 'profile' | 'owner' | 'caregiver' | 'password';
+type ActiveTab = 'profile' | 'password' | 'aboutme';
 
 @Component({
   selector: 'app-profile',
@@ -17,11 +17,11 @@ type ActiveTab = 'profile' | 'owner' | 'caregiver' | 'password';
   styleUrl: './profile-page.component.scss',
 })
 export class ProfilePageComponent implements OnInit {
-  private userService    = inject(UserService);
-  private profileService = inject(ProfileService);
-  private authService    = inject(AuthService);
-  private router         = inject(Router);
-  private cdr            = inject(ChangeDetectorRef);
+  private userService = inject(UserService);
+  private authService = inject(AuthService);
+  private caregiverService = inject(CaregiverService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   user: UserProfile | null = null;
   activeTab: ActiveTab = 'profile';
@@ -42,14 +42,8 @@ export class ProfilePageComponent implements OnInit {
   showNew = false;
   showConfirm = false;
 
-  // Create owner
-  ownerForm = { userName: '' };
-  ownerLoading = false;
-  ownerSuccess = '';
-  ownerError = '';
-
-  // Create caregiver
-  cgForm = { userName: '', bio: '' };
+  // About me / Bio
+  cgForm = { bio: '' };
   cgLoading = false;
   cgSuccess = '';
   cgError = '';
@@ -70,14 +64,18 @@ export class ProfilePageComponent implements OnInit {
       next: (res) => {
         this.user = res.value ?? null;
         if (this.user) {
-          this.editForm.userName    = this.user.fullName;
-          this.editForm.email       = this.user.email;
+          this.editForm.userName = this.user.fullName;
+          this.editForm.email = this.user.email;
           this.editForm.phoneNumber = this.user.phoneNumber;
+          this.cgForm.bio = this.user.careGiverBio ?? '';
         }
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: () => { this.isLoading = false; this.cdr.detectChanges(); },
+      error: () => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 
@@ -85,98 +83,81 @@ export class ProfilePageComponent implements OnInit {
     this.activeTab = tab;
     this.editSuccess = this.editError = '';
     this.pwSuccess = this.pwError = '';
-    this.ownerSuccess = this.ownerError = '';
     this.cgSuccess = this.cgError = '';
   }
 
   // ── Edit Profile ───────────────────────────────────────────────────────
 
   saveProfile() {
-    this.editError = ''; this.editSuccess = '';
+    this.editError = '';
+    this.editSuccess = '';
     this.editLoading = true;
-    this.userService.editUser({
-      userName: this.editForm.userName || undefined,
-      email: this.editForm.email || undefined,
-      phoneNumber: this.editForm.phoneNumber || undefined,
-    }).subscribe({
-      next: () => {
-        this.editLoading = false;
-        this.editSuccess = 'Profile updated successfully!';
-        this.loadProfile();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.editLoading = false;
-        this.editError = err.error?.message || 'Update failed.';
-        this.cdr.detectChanges();
-      },
-    });
+    this.userService
+      .editUser({
+        userName: this.editForm.userName || undefined,
+        email: this.editForm.email || undefined,
+        phoneNumber: this.editForm.phoneNumber || undefined,
+      })
+      .subscribe({
+        next: () => {
+          this.editLoading = false;
+          this.editSuccess = 'Profile updated successfully!';
+          this.loadProfile();
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.editLoading = false;
+          this.editError = err.error?.message || 'Update failed.';
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   // ── Change Password ────────────────────────────────────────────────────
 
   changePassword() {
-    this.pwError = ''; this.pwSuccess = '';
+    this.pwError = '';
+    this.pwSuccess = '';
     if (this.pwForm.newPassword !== this.pwForm.confirmPassword) {
-      this.pwError = 'Passwords do not match.'; return;
+      this.pwError = 'Passwords do not match.';
+      return;
     }
     this.pwLoading = true;
-    this.userService.changePassword({
-      oldPassword: this.pwForm.oldPassword,
-      newPassword: this.pwForm.newPassword,
-    }).subscribe({
-      next: () => {
-        this.pwLoading = false;
-        this.pwSuccess = 'Password changed successfully!';
-        this.pwForm = { oldPassword: '', newPassword: '', confirmPassword: '' };
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.pwLoading = false;
-        this.pwError = err.error?.message || 'Change failed.';
-        this.cdr.detectChanges();
-      },
-    });
+    this.userService
+      .changePassword({
+        oldPassword: this.pwForm.oldPassword,
+        newPassword: this.pwForm.newPassword,
+      })
+      .subscribe({
+        next: () => {
+          this.pwLoading = false;
+          this.pwSuccess = 'Password changed successfully!';
+          this.pwForm = { oldPassword: '', newPassword: '', confirmPassword: '' };
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.pwLoading = false;
+          this.pwError = err.error?.message || 'Change failed.';
+          this.cdr.detectChanges();
+        },
+      });
   }
 
-  // ── Create Owner ───────────────────────────────────────────────────────
+  // ── About Me / Bio ─────────────────────────────────────────────────────
 
-  createOwner() {
-    this.ownerError = ''; this.ownerSuccess = '';
-    if (!this.ownerForm.userName) { this.ownerError = 'Username is required.'; return; }
-    this.ownerLoading = true;
-    this.profileService.createOwner({ userName: this.ownerForm.userName }).subscribe({
-      next: () => {
-        this.ownerLoading = false;
-        this.ownerSuccess = 'Owner profile created! Go to the Owner Dashboard.';
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.ownerLoading = false;
-        this.ownerError = err.error?.message || 'Creation failed.';
-        this.cdr.detectChanges();
-      },
-    });
-  }
-
-  // ── Create CareGiver ───────────────────────────────────────────────────
-
-  createCaregiver() {
-    this.cgError = ''; this.cgSuccess = '';
-    if (!this.cgForm.userName) { this.cgError = 'Username is required.'; return; }
+  saveBio() {
+    this.cgError = '';
+    this.cgSuccess = '';
     this.cgLoading = true;
-    this.profileService.createCaregiver({
-      userName: this.cgForm.userName,
-      bio: this.cgForm.bio,
-    }).subscribe({
+    this.caregiverService.updateBio(this.cgForm.bio).subscribe({
       next: () => {
         this.cgLoading = false;
-        this.cgSuccess = 'Caregiver profile created! Go to the Caregiver Dashboard.';
+        this.cgSuccess = 'Bio saved!';
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.cgLoading = false;
-        this.cgError = err.error?.message || 'Creation failed.';
+        this.cgError = err.error?.message || 'Failed to save bio.';
         this.cdr.detectChanges();
       },
     });
@@ -207,17 +188,25 @@ export class ProfilePageComponent implements OnInit {
   removeAvatar() {
     this.avatarLoading = true;
     this.userService.deleteAvatar().subscribe({
-      next: () => { this.avatarLoading = false; this.loadProfile(); },
-      error: () => { this.avatarLoading = false; },
+      next: () => {
+        this.avatarLoading = false;
+        this.loadProfile();
+      },
+      error: () => {
+        this.avatarLoading = false;
+      },
     });
   }
 
   getAvatarUrl(): string {
-    return this.user?.avatarUrl
-      ? `${this.BASE_URL}${this.user.avatarUrl}`
-      : '';
+    return this.user?.avatarUrl ? `${this.BASE_URL}${this.user.avatarUrl}` : '';
   }
 
-  logout() { this.authService.logout(); this.router.navigate(['/login']); }
-  goBack()  { this.router.navigate(['/profile']); }
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+  goBack() {
+    this.router.navigate(['/profile']);
+  }
 }

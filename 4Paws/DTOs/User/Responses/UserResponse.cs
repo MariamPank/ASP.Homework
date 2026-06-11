@@ -9,6 +9,7 @@ namespace _4Paws.DTOs.User.Responses
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public UserRole Role { get; set; } = UserRole.User;
-        public string? AvatarUrl { get; set; }  // ← new
+        public string? AvatarUrl { get; set; }
+        public string CareGiverBio { get; set; } = string.Empty;
     }
 }

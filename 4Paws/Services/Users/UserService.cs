@@ -16,9 +16,10 @@ namespace _4Paws.Services.User
         public Result<UserResponse> GetById(int userId)
         {
             var user = _db.Users.Find(userId);
-
             if (user == null)
                 return Result<UserResponse>.NotFound("User not found");
+
+            var careGiver = _db.CareGivers.FirstOrDefault(c => c.UserId == userId);
 
             return Result<UserResponse>.Ok(new UserResponse
             {
@@ -28,6 +29,7 @@ namespace _4Paws.Services.User
                 PhoneNumber = user.PhoneNumber,
                 Role = user.Role,
                 AvatarUrl = user.AvatarUrl,
+                CareGiverBio = careGiver?.Bio ?? string.Empty,
             });
         }
 

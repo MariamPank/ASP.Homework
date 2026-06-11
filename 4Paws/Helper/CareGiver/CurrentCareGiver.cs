@@ -1,6 +1,7 @@
 ﻿
 using _4Paws.Data;
 using _4Paws.Helper.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace _4Paws.Helper.CareGiver
 {
@@ -22,7 +23,7 @@ namespace _4Paws.Helper.CareGiver
             if (userId == 0)
                 return null;
 
-            return _db.CareGivers.FirstOrDefault(x => x.UserId == userId);
+            return _db.CareGivers.Include(x => x.User).FirstOrDefault(x => x.UserId == userId);
         }
     }
 }

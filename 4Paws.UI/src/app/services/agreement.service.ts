@@ -10,15 +10,15 @@ export class AgreementService {
 
   constructor(private http: HttpClient) {}
 
+  createAgreement(applicationId: number): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.BASE}/create/${applicationId}`, {});
+  }
+
   getMyAgreements(): Observable<ApiResponse<Agreement[]>> {
-    return this.http.get<ApiResponse<Agreement[]>>(
-      `${this.BASE}/my-agreements`
-    );
+    return this.http.get<ApiResponse<Agreement[]>>(`${this.BASE}/my-agreements`);
   }
 
   completeAgreement(id: number): Observable<ApiResponse> {
-    return this.http.put<ApiResponse>(
-      `${this.BASE}/${id}/complete`, {}
-    );
+    return this.http.put<ApiResponse>(`${this.BASE}/${id}/complete`, {});
   }
 }

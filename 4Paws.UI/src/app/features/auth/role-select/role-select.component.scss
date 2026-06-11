@@ -16,7 +16,7 @@
 
 .role-container {
   width: 100%;
-  max-width: 580px;
+  max-width: 860px;
 }
 
 // ── Header ─────────────────────────────────────────────
@@ -49,13 +49,14 @@
 // ── Cards ──────────────────────────────────────────────
 
 .cards {
+  .cards-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1rem;
-
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-  }
 }
 
 .role-card {
@@ -68,7 +69,6 @@
   position: relative;
   overflow: hidden;
 
-  // Subtle colored top accent bar
   &::before {
     content: '';
     position: absolute;
@@ -130,25 +130,34 @@
   }
 }
 
+// ── Bottom links ───────────────────────────────────────
+
 .bottom-links {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 0;
   margin-top: 1.5rem;
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 
   button {
+    flex: 1;
     background: none;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-md);
+    border: none;
+    border-right: 1.5px solid var(--border);
     padding: 0.55rem 1.1rem;
     font-size: 0.88rem;
     font-weight: 500;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
+    transition: background 0.2s, color 0.2s;
+
+    &:last-child { border-right: none; }
 
     &:hover {
-      border-color: var(--primary);
+      background: var(--primary-bg);
       color: var(--primary);
     }
   }

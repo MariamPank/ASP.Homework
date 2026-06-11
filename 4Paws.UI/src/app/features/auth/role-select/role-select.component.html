@@ -1,34 +1,39 @@
 <div class="role-wrapper">
   <div class="role-container">
-
     <div class="header">
       <div class="brand-icon">🐾</div>
       <h1>Welcome to 4Paws</h1>
       <p>How would you like to continue?</p>
     </div>
 
-    <div class="cards">
+    <div class="cards-section">
+      <div class="cards">
+        <div class="role-card" (click)="goToOwner()">
+          <div class="card-icon">🏠</div>
+          <h2>Pet Owner</h2>
+          <p>Find trusted caregivers for your pets, manage listings and agreements.</p>
+          <div class="card-arrow">→</div>
+        </div>
 
-      <div class="role-card" (click)="goToOwner()">
-        <div class="card-icon">🏠</div>
-        <h2>Pet Owner</h2>
-        <p>Find trusted caregivers for your pets, manage listings and agreements.</p>
-        <div class="card-arrow">→</div>
+        <div class="role-card" (click)="goToCaregiver()">
+          <div class="card-icon">🐶</div>
+          <h2>Caregiver</h2>
+          <p>Offer your pet care services, manage your schedule and applications.</p>
+          <div class="card-arrow">→</div>
+        </div>
+
+        <div class="role-card" *ngIf="isAdmin" (click)="goToAdmin()">
+          <div class="card-icon">🛡️</div>
+          <h2>Admin Dashboard</h2>
+          <p>Manage users, listings and platform data.</p>
+          <div class="card-arrow">→</div>
+        </div>
       </div>
 
-      <div class="role-card" (click)="goToCaregiver()">
-        <div class="card-icon">🐶</div>
-        <h2>Caregiver</h2>
-        <p>Offer your pet care services, manage your schedule and applications.</p>
-        <div class="card-arrow">→</div>
+      <div class="bottom-links">
+        <button (click)="goToProfile()">👤 My Profile</button>
+        <button (click)="goToListings()">🔍 Browse Listings</button>
       </div>
-
     </div>
-
-    <div class="bottom-links">
-      <button (click)="goToProfile()">👤 My Profile</button>
-      <button (click)="goToListings()">🔍 Browse Listings</button>
-    </div>
-
   </div>
 </div>

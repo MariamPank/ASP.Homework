@@ -241,19 +241,19 @@ namespace _4Paws.Services.Admin
                 .Include(a => a.Owner).ThenInclude(o => o.User)
                 .Include(a => a.CareGiver).ThenInclude(c => c.User)
                 .OrderByDescending(a => a.CreatedAt)
+                .ToList()
                 .Select(a => new ApplicationResponse
                 {
                     Id = a.Id,
                     ListingId = a.ListingId,
                     ApplicantId = a.OwnerId ?? a.CareGiverId ?? 0,
-                    ApplicantName = a.Owner != null
-                        ? a.Owner.User.FullName
-                        : a.CareGiver != null ? a.CareGiver.User.FullName : "Unknown",
+                    ApplicantName = a.Owner?.User?.FullName
+                        ?? a.CareGiver?.User?.FullName
+                        ?? "Unknown",
                     Message = a.Message,
                     Status = a.Status,
                     CreatedAt = a.CreatedAt,
-                })
-                .ToList();
+                });
 
             return Result<IEnumerable<ApplicationResponse>>.Ok(applications);
         }

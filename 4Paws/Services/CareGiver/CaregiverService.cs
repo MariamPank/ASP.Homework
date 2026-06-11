@@ -185,6 +185,18 @@ namespace _4Paws.Services.CareGiver
             return Result<List<GetCaregiverListingsResponse>>.Ok(listings);
         }
 
+        public Result<int> UpdateBio(int careGiverId, string bio)
+        {
+            var careGiver = _db.CareGivers.FirstOrDefault(c => c.Id == careGiverId);
+            if (careGiver == null)
+                return Result<int>.NotFound("CareGiver not found.");
+
+            careGiver.Bio = bio;
+            _db.SaveChanges();
+
+            return Result<int>.Ok(careGiverId);
+        }
+
         // ── Cache invalidation helper — call when caregiver data changes ──
         public void InvalidateCaregiverCache(int caregiverId)
         {

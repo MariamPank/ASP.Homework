@@ -1,5 +1,4 @@
 <div class="page-wrapper">
-
   <!-- Hero bar -->
   <div class="hero-bar">
     <div class="hero-nav">
@@ -22,7 +21,6 @@
   </div>
 
   <div class="page-content" *ngIf="!isLoading">
-
     <!-- Avatar card -->
     <div class="avatar-card">
       <div class="avatar-wrap">
@@ -41,8 +39,16 @@
           <label class="btn-sm primary" for="avatarInput">
             {{ getAvatarUrl() ? 'Change photo' : 'Upload photo' }}
           </label>
-          <input id="avatarInput" type="file" accept="image/*" (change)="onAvatarSelected($event)" hidden />
-          <button class="btn-sm danger-outline" *ngIf="getAvatarUrl()" (click)="removeAvatar()">Remove</button>
+          <input
+            id="avatarInput"
+            type="file"
+            accept="image/*"
+            (change)="onAvatarSelected($event)"
+            hidden
+          />
+          <button class="btn-sm danger-outline" *ngIf="getAvatarUrl()" (click)="removeAvatar()">
+            Remove
+          </button>
         </div>
         <div class="field-error" *ngIf="avatarError">{{ avatarError }}</div>
       </div>
@@ -50,10 +56,15 @@
 
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab" [class.active]="activeTab === 'profile'"   (click)="setTab('profile')">Edit Profile</button>
-      <button class="tab" [class.active]="activeTab === 'password'"  (click)="setTab('password')">Password</button>
-      <button class="tab" [class.active]="activeTab === 'owner'"     (click)="setTab('owner')">Owner Profile</button>
-      <button class="tab" [class.active]="activeTab === 'caregiver'" (click)="setTab('caregiver')">CareGiver Profile</button>
+      <button class="tab" [class.active]="activeTab === 'profile'" (click)="setTab('profile')">
+        Edit Profile
+      </button>
+      <button class="tab" [class.active]="activeTab === 'password'" (click)="setTab('password')">
+        Password
+      </button>
+      <button class="tab" [class.active]="activeTab === 'aboutme'" (click)="setTab('aboutme')">
+        About Me
+      </button>
     </div>
 
     <!-- ── Edit Profile ─────────────────────────────────────────────── -->
@@ -71,7 +82,7 @@
         <input type="text" [(ngModel)]="editForm.phoneNumber" placeholder="+995 5xx xxx xxx" />
       </div>
       <div class="success-msg" *ngIf="editSuccess">✅ {{ editSuccess }}</div>
-      <div class="field-error"  *ngIf="editError">{{ editError }}</div>
+      <div class="field-error" *ngIf="editError">{{ editError }}</div>
       <button class="btn-primary" (click)="saveProfile()" [disabled]="editLoading">
         <span *ngIf="!editLoading">Save changes</span>
         <span *ngIf="editLoading" class="spinner-sm"></span>
@@ -83,53 +94,73 @@
       <div class="field">
         <label>Current password</label>
         <div class="pw-wrap">
-          <input [type]="showOld ? 'text' : 'password'" [(ngModel)]="pwForm.oldPassword" placeholder="••••••••" />
-          <button type="button" class="toggle-pw" (click)="showOld = !showOld">{{ showOld ? 'Hide' : 'Show' }}</button>
+          <input
+            [type]="showOld ? 'text' : 'password'"
+            [(ngModel)]="pwForm.oldPassword"
+            placeholder="••••••••"
+          />
+          <button type="button" class="toggle-pw" (click)="showOld = !showOld">
+            {{ showOld ? 'Hide' : 'Show' }}
+          </button>
         </div>
       </div>
       <div class="field">
         <label>New password</label>
         <div class="pw-wrap">
-          <input [type]="showNew ? 'text' : 'password'" [(ngModel)]="pwForm.newPassword" placeholder="••••••••" />
-          <button type="button" class="toggle-pw" (click)="showNew = !showNew">{{ showNew ? 'Hide' : 'Show' }}</button>
+          <input
+            [type]="showNew ? 'text' : 'password'"
+            [(ngModel)]="pwForm.newPassword"
+            placeholder="••••••••"
+          />
+          <button type="button" class="toggle-pw" (click)="showNew = !showNew">
+            {{ showNew ? 'Hide' : 'Show' }}
+          </button>
         </div>
       </div>
       <div class="field">
         <label>Confirm new password</label>
         <div class="pw-wrap">
-          <input [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="pwForm.confirmPassword" placeholder="••••••••" />
-          <button type="button" class="toggle-pw" (click)="showConfirm = !showConfirm">{{ showConfirm ? 'Hide' : 'Show' }}</button>
+          <input
+            [type]="showConfirm ? 'text' : 'password'"
+            [(ngModel)]="pwForm.confirmPassword"
+            placeholder="••••••••"
+          />
+          <button type="button" class="toggle-pw" (click)="showConfirm = !showConfirm">
+            {{ showConfirm ? 'Hide' : 'Show' }}
+          </button>
         </div>
       </div>
       <div class="success-msg" *ngIf="pwSuccess">✅ {{ pwSuccess }}</div>
-      <div class="field-error"  *ngIf="pwError">{{ pwError }}</div>
+      <div class="field-error" *ngIf="pwError">{{ pwError }}</div>
       <button class="btn-primary" (click)="changePassword()" [disabled]="pwLoading">
         <span *ngIf="!pwLoading">Change password</span>
         <span *ngIf="pwLoading" class="spinner-sm"></span>
       </button>
     </div>
 
-    <!-- ── Create Owner Profile ─────────────────────────────────────── -->
+    <!-- ── Create Owner Profile ───────────────────────────────────────
     <div class="tab-panel" *ngIf="activeTab === 'owner'">
       <div class="info-box">
-        🏠 Create an <strong>Owner</strong> profile to post listings and find caregivers for your pets.
+        🏠 Create an <strong>Owner</strong> profile to post listings and find caregivers for your
+        pets.
       </div>
       <div class="field">
         <label>Owner username</label>
         <input type="text" [(ngModel)]="ownerForm.userName" placeholder="e.g. Mariam" />
       </div>
       <div class="success-msg" *ngIf="ownerSuccess">✅ {{ ownerSuccess }}</div>
-      <div class="field-error"  *ngIf="ownerError">{{ ownerError }}</div>
+      <div class="field-error" *ngIf="ownerError">{{ ownerError }}</div>
       <button class="btn-primary" (click)="createOwner()" [disabled]="ownerLoading">
         <span *ngIf="!ownerLoading">Create Owner profile</span>
         <span *ngIf="ownerLoading" class="spinner-sm"></span>
       </button>
-    </div>
+    </div> -->
 
     <!-- ── Create CareGiver Profile ─────────────────────────────────── -->
-    <div class="tab-panel" *ngIf="activeTab === 'caregiver'">
+    <!-- <div class="tab-panel" *ngIf="activeTab === 'caregiver'">
       <div class="info-box">
-        🐶 Create a <strong>CareGiver</strong> profile to offer pet care services and accept agreements.
+        🐶 Create a <strong>CareGiver</strong> profile to offer pet care services and accept
+        agreements.
       </div>
       <div class="field">
         <label>Caregiver username</label>
@@ -137,15 +168,39 @@
       </div>
       <div class="field">
         <label>Bio <span class="optional">(optional)</span></label>
-        <textarea [(ngModel)]="cgForm.bio" placeholder="Tell pet owners about your experience..." rows="4"></textarea>
+        <textarea
+          [(ngModel)]="cgForm.bio"
+          placeholder="Tell pet owners about your experience..."
+          rows="4"
+        ></textarea>
       </div>
       <div class="success-msg" *ngIf="cgSuccess">✅ {{ cgSuccess }}</div>
-      <div class="field-error"  *ngIf="cgError">{{ cgError }}</div>
+      <div class="field-error" *ngIf="cgError">{{ cgError }}</div>
       <button class="btn-primary" (click)="createCaregiver()" [disabled]="cgLoading">
         <span *ngIf="!cgLoading">Create CareGiver profile</span>
         <span *ngIf="cgLoading" class="spinner-sm"></span>
       </button>
-    </div>
+    </div> -->
 
+    <div class="tab-panel" *ngIf="activeTab === 'aboutme'">
+      <div class="info-box">
+        🐶 This bio is shown to pet owners when they view your caregiver profile.
+      </div>
+      <div class="field">
+        <label>About me</label>
+        <textarea
+          [(ngModel)]="cgForm.bio"
+          rows="5"
+          placeholder="Tell pet owners about your experience, availability, and the types of pets you care for..."
+        >
+        </textarea>
+      </div>
+      <div class="success-msg" *ngIf="cgSuccess">✅ {{ cgSuccess }}</div>
+      <div class="field-error" *ngIf="cgError">{{ cgError }}</div>
+      <button class="btn-primary" (click)="saveBio()" [disabled]="cgLoading">
+        <span *ngIf="!cgLoading">Save</span>
+        <span *ngIf="cgLoading" class="spinner-sm"></span>
+      </button>
+    </div>
   </div>
 </div>

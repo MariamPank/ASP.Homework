@@ -6,6 +6,7 @@ export interface UserProfile {
   email: string;
   phoneNumber: string;
   avatarUrl: string | null;
+  careGiverBio: string;
 }
 
 export interface EditUserRequest {
@@ -17,33 +18,6 @@ export interface EditUserRequest {
 export interface ChangePasswordRequest {
   oldPassword: string;
   newPassword: string;
-}
-
-// ── Owner models ──────────────────────────────────────────────────────────
-
-export interface CreateOwnerRequest {
-  userName: string;
-}
-
-export interface CreateOwnerResponse {
-  id: number;
-  userName: string;
-  ownerRating: number;
-  userId: number;
-}
-
-// ── CareGiver models ──────────────────────────────────────────────────────
-
-export interface CreateCaregiverRequest {
-  userName: string;
-  bio: string;
-}
-
-export interface CreateCaregiverResponse {
-  id: number;
-  userName: string;
-  caregiverRating: number;
-  userId: number;
 }
 
 // ── Pet models ────────────────────────────────────────────────────────────

@@ -6,6 +6,9 @@ import { ListingService } from '../../services/listing.service';
 import { PetService } from '../../services/pet.service';
 import { AuthService } from '../../services/auth.service';
 import { Listing, ListingType, ListingStatus, Pet } from '../../models/feature.models';
+import { ApplicationService } from '../../services/application.service';
+import { Application, ApplicationStatus } from '../../models/application.models';
+import { AgreementService } from '../../services/agreement.service';
 
 @Component({
   selector: 'app-my-listings',
@@ -16,10 +19,16 @@ import { Listing, ListingType, ListingStatus, Pet } from '../../models/feature.m
 })
 export class MyListingsComponent implements OnInit {
   private listingService = inject(ListingService);
-  private petService     = inject(PetService);
-  private authService    = inject(AuthService);
-  private router         = inject(Router);
-  private cdr            = inject(ChangeDetectorRef);
+  private petService = inject(PetService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+  private appService = inject(ApplicationService);
+  private agreementService = inject(AgreementService);
+
+  applicationsMap: Record<number, Application[]> = {};
+  loadingApplications: number | null = null;
+  ApplicationStatus = ApplicationStatus;
 
   listings: Listing[] = [];
   myPets: Pet[] = [];
@@ -56,7 +65,10 @@ export class MyListingsComponent implements OnInit {
   ngOnInit() {
     this.loadListings();
     this.petService.getMyPets().subscribe({
-      next: (res) => { this.myPets = res.value ?? []; this.cdr.detectChanges(); },
+      next: (res) => {
+        this.myPets = res.value ?? [];
+        this.cdr.detectChanges();
+      },
       error: () => {},
     });
   }
@@ -76,6 +88,63 @@ export class MyListingsComponent implements OnInit {
     });
   }
 
+  loadApplications(listingId: number) {
+    if (this.applicationsMap[listingId]) {
+      // toggle off if already loaded
+      delete this.applicationsMap[listingId];
+      this.cdr.detectChanges();
+      return;
+    }
+    this.loadingApplications = listingId;
+    this.appService.getApplicationsForListing(listingId).subscribe({
+      next: (res) => {
+        this.applicationsMap[listingId] = res.value ?? [];
+        this.loadingApplications = null;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loadingApplications = null;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  updateStatus(applicationId: number, listingId: number, status: ApplicationStatus) {
+    this.appService.updateStatus(applicationId, { status }).subscribe({
+      next: () => {
+        // Reload applications directly without toggling off
+        this.loadingApplications = listingId;
+        this.appService.getApplicationsForListing(listingId).subscribe({
+          next: (res) => {
+            this.applicationsMap[listingId] = res.value ?? [];
+            this.loadingApplications = null;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.loadingApplications = null;
+          },
+        });
+        this.loadListings();
+      },
+      error: (err) => {
+        console.error('Update status failed:', err);
+        alert(err.error?.message || 'Failed to update status.');
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  createAgreement(applicationId: number) {
+    this.agreementService.createAgreement(applicationId).subscribe({
+      next: () => {
+        alert('Agreement created successfully! View it in My Agreements.');
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Failed to create agreement.');
+      },
+    });
+  }
+
   toggleCreateForm() {
     this.showCreateForm = !this.showCreateForm;
     this.createError = '';
@@ -86,38 +155,61 @@ export class MyListingsComponent implements OnInit {
   createListing() {
     this.createError = '';
     const f = this.createForm;
-    if (!f.title.trim())       { this.createError = 'Title is required.'; return; }
-    if (!f.description.trim()) { this.createError = 'Description is required.'; return; }
-    if (!f.startDate)          { this.createError = 'Start date is required.'; return; }
-    if (!f.endDate)            { this.createError = 'End date is required.'; return; }
-    if (f.proposedBudget <= 0) { this.createError = 'Budget must be greater than 0.'; return; }
+    if (!f.title.trim()) {
+      this.createError = 'Title is required.';
+      return;
+    }
+    if (!f.description.trim()) {
+      this.createError = 'Description is required.';
+      return;
+    }
+    if (!f.startDate) {
+      this.createError = 'Start date is required.';
+      return;
+    }
+    if (!f.endDate) {
+      this.createError = 'End date is required.';
+      return;
+    }
+    if (f.proposedBudget <= 0) {
+      this.createError = 'Budget must be greater than 0.';
+      return;
+    }
 
     this.createLoading = true;
-    this.listingService.createListing({
-      title:          f.title,
-      description:    f.description,
-      listingType:    f.listingType,
-      startDate:      f.startDate,
-      endDate:        f.endDate,
-      proposedBudget: f.proposedBudget,
-      petId:          f.petId,
-      petName:        f.petName || undefined,
-    }).subscribe({
-      next: () => {
-        this.createLoading = false;
-        this.showCreateForm = false;
-        this.createForm = {
-          title: '', description: '', listingType: ListingType.OwnerNeedsCareGiver,
-          startDate: '', endDate: '', proposedBudget: 0, petId: undefined, petName: '',
-        };
-        this.loadListings();
-      },
-      error: (err) => {
-        this.createLoading = false;
-        this.createError = err.error?.message || 'Failed to create listing.';
-        this.cdr.detectChanges();
-      },
-    });
+    this.listingService
+      .createListing({
+        title: f.title,
+        description: f.description,
+        listingType: f.listingType,
+        startDate: f.startDate,
+        endDate: f.endDate,
+        proposedBudget: f.proposedBudget,
+        petId: f.petId,
+        petName: f.petName || undefined,
+      })
+      .subscribe({
+        next: () => {
+          this.createLoading = false;
+          this.showCreateForm = false;
+          this.createForm = {
+            title: '',
+            description: '',
+            listingType: ListingType.OwnerNeedsCareGiver,
+            startDate: '',
+            endDate: '',
+            proposedBudget: 0,
+            petId: undefined,
+            petName: '',
+          };
+          this.loadListings();
+        },
+        error: (err) => {
+          this.createLoading = false;
+          this.createError = err.error?.message || 'Failed to create listing.';
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   // ── Edit ───────────────────────────────────────────────────────────────
@@ -125,16 +217,18 @@ export class MyListingsComponent implements OnInit {
   startEdit(listing: Listing) {
     this.editingListing = listing;
     this.editForm = {
-      title:          listing.title,
-      description:    listing.description,
+      title: listing.title,
+      description: listing.description,
       proposedBudget: listing.proposedBudget,
-      startDate:      listing.startDate.split('T')[0],
-      endDate:        listing.endDate.split('T')[0],
+      startDate: listing.startDate.split('T')[0],
+      endDate: listing.endDate.split('T')[0],
     };
     this.editError = '';
   }
 
-  cancelEdit() { this.editingListing = null; }
+  cancelEdit() {
+    this.editingListing = null;
+  }
 
   saveListing() {
     if (!this.editingListing) return;
@@ -159,8 +253,14 @@ export class MyListingsComponent implements OnInit {
     if (!confirm(`Delete "${listing.title}"?`)) return;
     this.deleteLoading = listing.id;
     this.listingService.deleteListing(listing.id).subscribe({
-      next: () => { this.deleteLoading = null; this.loadListings(); },
-      error: () => { this.deleteLoading = null; this.cdr.detectChanges(); },
+      next: () => {
+        this.deleteLoading = null;
+        this.loadListings();
+      },
+      error: () => {
+        this.deleteLoading = null;
+        this.cdr.detectChanges();
+      },
     });
   }
 
@@ -179,9 +279,18 @@ export class MyListingsComponent implements OnInit {
   }
 
   formatDate(d: string): string {
-    return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    return new Date(d).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
   }
 
-  logout() { this.authService.logout(); this.router.navigate(['/login']); }
-  goBack() { this.router.navigate(['/owner-dashboard']); }
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+  goBack() {
+    this.router.navigate(['/owner-dashboard']);
+  }
 }

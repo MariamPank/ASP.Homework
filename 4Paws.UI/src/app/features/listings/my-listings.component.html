@@ -1,5 +1,4 @@
 <div class="page-wrapper">
-
   <!-- Hero bar -->
   <div class="hero-bar">
     <div class="hero-nav">
@@ -16,7 +15,6 @@
   </div>
 
   <div class="page-content">
-
     <!-- Loading -->
     <div class="loading" *ngIf="isLoading">
       <div class="spinner"></div>
@@ -24,10 +22,11 @@
     </div>
 
     <div *ngIf="!isLoading">
-
       <!-- Header row -->
       <div class="list-header">
-        <span class="list-count">{{ listings.length }} listing{{ listings.length !== 1 ? 's' : '' }}</span>
+        <span class="list-count"
+          >{{ listings.length }} listing{{ listings.length !== 1 ? 's' : '' }}</span
+        >
         <button class="btn-primary" (click)="toggleCreateForm()">
           {{ showCreateForm ? '✕ Cancel' : '+ New listing' }}
         </button>
@@ -41,14 +40,18 @@
         <div class="field">
           <label>Listing type</label>
           <div class="type-toggle">
-            <button type="button"
+            <button
+              type="button"
               [class.active]="createForm.listingType === ListingType.OwnerNeedsCareGiver"
-              (click)="createForm.listingType = ListingType.OwnerNeedsCareGiver">
+              (click)="createForm.listingType = ListingType.OwnerNeedsCareGiver"
+            >
               🏠 Needs CareGiver
             </button>
-            <button type="button"
+            <button
+              type="button"
               [class.active]="createForm.listingType === ListingType.CareGiverOffersService"
-              (click)="createForm.listingType = ListingType.CareGiverOffersService">
+              (click)="createForm.listingType = ListingType.CareGiverOffersService"
+            >
               🐶 Offers Service
             </button>
           </div>
@@ -56,12 +59,20 @@
 
         <div class="field">
           <label>Title</label>
-          <input type="text" [(ngModel)]="createForm.title" placeholder="e.g. Need a cat sitter for Luna" />
+          <input
+            type="text"
+            [(ngModel)]="createForm.title"
+            placeholder="e.g. Need a cat sitter for Luna"
+          />
         </div>
 
         <div class="field">
           <label>Description</label>
-          <textarea [(ngModel)]="createForm.description" rows="4" placeholder="Describe what you need or offer..."></textarea>
+          <textarea
+            [(ngModel)]="createForm.description"
+            rows="4"
+            placeholder="Describe what you need or offer..."
+          ></textarea>
         </div>
 
         <!-- Pet selector — only for Owner listings -->
@@ -112,7 +123,6 @@
       <!-- Listing cards -->
       <div class="listings-list" *ngIf="listings.length > 0">
         <div class="listing-item" *ngFor="let listing of listings">
-
           <!-- Edit mode -->
           <div class="edit-form" *ngIf="editingListing?.id === listing.id">
             <h3 class="form-title">✏️ Edit listing</h3>
@@ -152,9 +162,11 @@
           <div class="listing-view" *ngIf="editingListing?.id !== listing.id">
             <div class="listing-top">
               <div>
-                <span class="type-badge"
+                <span
+                  class="type-badge"
                   [class.type-owner]="listing.listingType === ListingType.OwnerNeedsCareGiver"
-                  [class.type-cg]="listing.listingType === ListingType.CareGiverOffersService">
+                  [class.type-cg]="listing.listingType === ListingType.CareGiverOffersService"
+                >
                   {{ getTypeLabel(listing.listingType) }}
                 </span>
                 <span class="status-badge" [ngClass]="getStatusClass(listing.status)">
@@ -169,20 +181,83 @@
               📅 {{ formatDate(listing.startDate) }} → {{ formatDate(listing.endDate) }}
             </div>
             <div class="listing-actions">
-              <button class="btn-sm outline" (click)="startEdit(listing)"
-                *ngIf="listing.status === ListingStatus.Open">✏️ Edit</button>
-              <button class="btn-sm danger-outline"
+              <button
+                class="btn-sm outline"
+                (click)="startEdit(listing)"
+                *ngIf="listing.status === ListingStatus.Open"
+              >
+                ✏️ Edit
+              </button>
+              <button
+                class="btn-sm danger-outline"
                 (click)="deleteListing(listing)"
-                [disabled]="deleteLoading === listing.id">
+                [disabled]="deleteLoading === listing.id"
+              >
                 <span *ngIf="deleteLoading !== listing.id">🗑 Delete</span>
                 <span *ngIf="deleteLoading === listing.id" class="spinner-sm"></span>
               </button>
             </div>
           </div>
 
+          <!-- View Applications button -->
+          <button class="btn-applications" (click)="loadApplications(listing.id)">
+            {{ applicationsMap[listing.id] ? '▲ Hide Applications' : '▼ View Applications' }}
+            <span *ngIf="loadingApplications === listing.id" class="spinner-sm"></span>
+          </button>
+
+          <!-- Applications list -->
+          <div class="applications-panel" *ngIf="applicationsMap[listing.id]">
+            <p class="no-applications" *ngIf="applicationsMap[listing.id].length === 0">
+              No applications yet.
+            </p>
+            <div class="application-card" *ngFor="let app of applicationsMap[listing.id]">
+              <div class="application-header">
+                <span class="applicant-name">{{ app.applicantName }}</span>
+                <span
+                  class="app-status"
+                  [ngClass]="{
+                    'status-pending': app.status === ApplicationStatus.Pending,
+                    'status-accepted': app.status === ApplicationStatus.Accepted,
+                    'status-rejected': app.status === ApplicationStatus.Rejected,
+                  }"
+                  >{{
+                    app.status === ApplicationStatus.Pending
+                      ? 'Pending'
+                      : app.status === ApplicationStatus.Accepted
+                        ? 'Accepted'
+                        : 'Rejected'
+                  }}</span
+                >
+              </div>
+              <p class="application-message">{{ app.message }}</p>
+              <div class="application-meta">
+                <span *ngIf="app.proposedFee">💰 ₾{{ app.proposedFee }} &nbsp;·&nbsp;</span>
+                📅 {{ formatDate(app.createdAt) }}
+              </div>
+              <div class="application-actions" *ngIf="app.status === ApplicationStatus.Pending">
+                <button
+                  class="btn-accept"
+                  (click)="updateStatus(app.id, listing.id, ApplicationStatus.Accepted)"
+                >
+                  ✓ Accept
+                </button>
+                <button
+                  class="btn-reject"
+                  (click)="updateStatus(app.id, listing.id, ApplicationStatus.Rejected)"
+                >
+                  ✕ Reject
+                </button>
+              </div>
+
+              <div class="application-actions" *ngIf="app.status === ApplicationStatus.Accepted">
+                <button class="btn-accept" (click)="createAgreement(app.id)">
+                  📄 Create Agreement
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>

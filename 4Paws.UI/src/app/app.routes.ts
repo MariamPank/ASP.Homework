@@ -16,6 +16,7 @@ import { MyAgreementsComponent } from './features/agreements/my-agreements.compo
 import { LeaveReviewComponent } from './features/reviews/leave-review.component';
 import { PublicProfileComponent } from './features/reviews/public-profile.component';
 import { authGuard } from './guards/auth.guard';
+import { AdminDashboardComponent } from './features/admin/admin-dashboard.component';
 
 export const routes: Routes = [
   { path: '',                       redirectTo: 'login', pathMatch: 'full' },
@@ -35,5 +36,6 @@ export const routes: Routes = [
   { path: 'my-agreements',          component: MyAgreementsComponent,   canActivate: [authGuard] },
   { path: 'leave-review',           component: LeaveReviewComponent,    canActivate: [authGuard] },
   { path: 'public-profile/:type/:id',      component: PublicProfileComponent},
+  { path: 'admin', component: AdminDashboardComponent, canActivate: [authGuard] },
 
 ];

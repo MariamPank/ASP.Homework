@@ -1,0 +1,179 @@
+<div class="page-wrapper">
+  <!-- Hero bar -->
+  <div class="hero-bar">
+    <div class="hero-nav">
+      <div class="brand">🐾 4Paws</div>
+      <button class="btn-ghost danger" (click)="logout()">Log out</button>
+    </div>
+    <div class="hero-info">
+      <h2>Admin Dashboard</h2>
+      <span class="hero-sub">Manage users and platform data</span>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <!-- Stats -->
+    <div class="stats-grid" *ngIf="stats">
+      <div class="stat-card">
+        <span class="stat-value">{{ stats.totalUsers }}</span>
+        <span class="stat-label">Users</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ stats.totalListings }}</span>
+        <span class="stat-label">Listings</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ stats.totalApplications }}</span>
+        <span class="stat-label">Applications</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ stats.totalAgreements }}</span>
+        <span class="stat-label">Agreements</span>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">
+        👥 Users
+      </button>
+      <button class="tab" [class.active]="activeTab === 'listings'" (click)="setTab('listings')">
+        📋 Listings
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'applications'"
+        (click)="setTab('applications')"
+      >
+        📨 Applications
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'agreements'"
+        (click)="setTab('agreements')"
+      >
+        🤝 Agreements
+      </button>
+    </div>
+
+    <div class="loading" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+    <div class="field-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <!-- Users -->
+    <div *ngIf="activeTab === 'users' && !isLoading">
+      <div class="list-count">{{ users.length }} user{{ users.length !== 1 ? 's' : '' }}</div>
+      <div class="user-list">
+        <div class="user-row" *ngFor="let user of users">
+          <div class="user-info">
+            <span class="user-name">{{ user.username }}</span>
+            <span class="user-email">{{ user.email }}</span>
+            <span class="badge banned" *ngIf="user.isBanned">Banned</span>
+            <span class="badge unverified" *ngIf="!user.isVerified">Unverified</span>
+            <span class="badge admin-badge" *ngIf="user.role === 1">Admin</span>
+          </div>
+          <div class="user-actions">
+            <button
+              class="btn-sm danger-outline"
+              *ngIf="!user.isBanned && user.role !== 1"
+              (click)="ban(user)"
+            >
+              🚫 Ban
+            </button>
+            <button class="btn-sm outline" *ngIf="user.isBanned" (click)="unban(user)">
+              ✅ Unban
+            </button>
+            <button
+              class="btn-sm danger-outline"
+              *ngIf="user.role !== 1"
+              (click)="deleteUser(user)"
+            >
+              🗑 Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Listings -->
+    <div *ngIf="activeTab === 'listings' && !isLoading">
+      <div class="list-count">
+        {{ listings.length }} listing{{ listings.length !== 1 ? 's' : '' }}
+      </div>
+      <div class="user-list">
+        <div class="user-row" *ngFor="let l of listings">
+          <div class="user-info">
+            <span class="user-name">{{ l.title }}</span>
+            <span class="user-email">{{ l.ownerId ? 'Owner #' + l.ownerId : 'CareGiver #' + l.careGiverId }}</span>
+            <span class="badge admin-badge">{{
+              l.listingType === 1 ? 'Needs CareGiver' : 'Offers Service'
+            }}</span>
+            <span class="badge" [ngClass]="l.status === 1 ? 'badge-open' : 'banned'">{{
+              l.status === 1 ? 'Open' : 'Closed'
+            }}</span>
+          </div>
+          <div class="user-actions">
+            <button class="btn-sm danger-outline" (click)="deleteListing(l)">🗑 Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Applications -->
+    <div *ngIf="activeTab === 'applications' && !isLoading">
+      <div class="list-count">
+        {{ applications.length }} application{{ applications.length !== 1 ? 's' : '' }}
+      </div>
+      <div class="user-list">
+        <div class="user-row" *ngFor="let a of applications">
+          <div class="user-info">
+            <span class="user-name">{{ a.applicantName }}</span>
+            <span class="user-email">Listing #{{ a.listingId }}</span>
+            <span
+              class="badge"
+              [ngClass]="{
+                unverified: a.status === 1,
+                'admin-badge': a.status === 2,
+                banned: a.status === 3,
+              }"
+              >{{ a.status === 1 ? 'Pending' : a.status === 2 ? 'Accepted' : 'Rejected' }}</span
+            >
+          </div>
+          <div class="user-info">
+            <span class="user-email">{{ a.message }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agreements -->
+    <div *ngIf="activeTab === 'agreements' && !isLoading">
+      <div class="list-count">
+        {{ agreements.length }} agreement{{ agreements.length !== 1 ? 's' : '' }}
+      </div>
+      <div class="user-list">
+        <div class="user-row" *ngFor="let ag of agreements">
+          <div class="user-info">
+            <span class="user-name">Agreement #{{ ag.id }}</span>
+            <span class="user-email">₾{{ ag.agreedFee }}</span>
+            <span
+              class="badge"
+              [ngClass]="
+                ag.status === 1 ? 'admin-badge' : ag.status === 3 ? 'badge-open' : 'banned'
+              "
+            >
+              {{ ag.status === 1 ? 'Active' : ag.status === 2 ? 'Inactive' : 'Completed' }}
+            </span>
+          </div>
+          <div class="user-info">
+            <span class="user-email"
+              >📅 {{ formatDate(ag.startDate) }} → {{ formatDate(ag.endDate) }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

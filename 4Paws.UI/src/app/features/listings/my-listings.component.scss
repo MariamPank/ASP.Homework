@@ -486,3 +486,98 @@
     }
   }
 }
+
+
+// ── Applications ──────────────────────────────────────────────────────
+
+.btn-applications {
+  display: flex; align-items: center; gap: 0.5rem;
+  width: 100%; padding: 0.65rem 1.25rem;
+  background: var(--page-bg); border: none;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem; font-weight: 600;
+  color: var(--primary); cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover { background: var(--primary-bg); }
+}
+
+.applications-panel {
+  border-top: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+  background: #FAFAF9;
+}
+
+.no-applications {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0.75rem 0;
+}
+
+.application-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+
+  &:last-child { margin-bottom: 0; }
+}
+
+.application-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.applicant-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.app-status {
+  font-size: 0.72rem; font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+
+  &.status-pending  { background: #FEF9C3; color: #854D0E; }
+  &.status-accepted { background: var(--success-bg); color: var(--success-dark); }
+  &.status-rejected { background: var(--danger-bg);  color: var(--danger-dark); }
+}
+
+.application-message {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.5rem;
+}
+
+.application-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.application-actions {
+  display: flex; gap: 0.5rem;
+}
+
+.btn-accept {
+  padding: 0.35rem 0.9rem;
+  background: var(--success-bg); color: var(--success-dark);
+  border: 1.5px solid #9FE1CB; border-radius: var(--radius-sm);
+  font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+  &:hover { background: #D1FAE5; }
+}
+
+.btn-reject {
+  padding: 0.35rem 0.9rem;
+  background: var(--danger-bg); color: var(--danger-dark);
+  border: 1.5px solid #F7C1C1; border-radius: var(--radius-sm);
+  font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+  &:hover { background: #FEE2E2; }
+}

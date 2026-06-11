@@ -1,5 +1,4 @@
 <div class="page-wrapper">
-
   <div class="hero-bar">
     <div class="hero-nav">
       <div class="brand">🐾 4Paws</div>
@@ -15,7 +14,6 @@
   </div>
 
   <div class="page-content">
-
     <div class="loading" *ngIf="isLoading">
       <div class="spinner"></div>
       <p>Loading agreements...</p>
@@ -24,7 +22,6 @@
     <div class="field-error" *ngIf="errorMessage">{{ errorMessage }}</div>
 
     <div *ngIf="!isLoading">
-
       <div class="list-header">
         <span class="list-count">
           {{ agreements.length }} agreement{{ agreements.length !== 1 ? 's' : '' }}
@@ -32,18 +29,19 @@
       </div>
 
       <div class="global-success" *ngIf="completeSuccess">{{ completeSuccess }}</div>
-      <div class="global-error"   *ngIf="completeError">{{ completeError }}</div>
+      <div class="global-error" *ngIf="completeError">{{ completeError }}</div>
 
       <div class="empty-state" *ngIf="agreements.length === 0">
         <div class="empty-icon">🤝</div>
         <h3>No agreements yet</h3>
         <p>Agreements are created when an application is accepted.</p>
-        <button class="btn-primary" (click)="router.navigate(['/listings'])">Browse Listings</button>
+        <button class="btn-primary" (click)="router.navigate(['/listings'])">
+          Browse Listings
+        </button>
       </div>
 
       <div class="agreements-list" *ngIf="agreements.length > 0">
         <div class="agreement-card" *ngFor="let ag of agreements">
-
           <div class="agreement-top">
             <span class="agreement-id">Agreement #{{ ag.id }}</span>
             <span class="status-badge" [ngClass]="getStatusClass(ag.status)">
@@ -64,7 +62,7 @@
               <span class="info-label">Agreed fee</span>
               <span class="fee-value">₾{{ ag.agreedFee }}</span>
             </div>
-            <div class="info-row" *ngIf="ag.completeAt">
+            <div class="info-row" *ngIf="ag.status === AgreementStatus.Completed">
               <span class="info-label">Completed on</span>
               <span class="info-value">🏆 {{ formatDate(ag.completeAt) }}</span>
             </div>
@@ -81,21 +79,22 @@
               class="btn-complete"
               *ngIf="ag.status === AgreementStatus.Active"
               (click)="complete(ag)"
-              [disabled]="completeLoading === ag.id">
+              [disabled]="completeLoading === ag.id"
+            >
               <span *ngIf="completeLoading !== ag.id">🏁 Mark Complete</span>
               <span *ngIf="completeLoading === ag.id" class="spinner-sm"></span>
             </button>
           </div>
 
-          <button class="btn-sm outline"
-            *ngIf="ag.status === AgreementStatus.Completed"
-            (click)="leaveReview(ag)">
+          <button
+            class="btn-sm outline"
+            *ngIf="ag.status === AgreementStatus.Completed && !ag.hasReviewed"
+            (click)="leaveReview(ag)"
+          >
             ⭐ Leave Review
           </button>
-
         </div>
       </div>
-
     </div>
   </div>
 </div>

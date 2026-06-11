@@ -9,7 +9,8 @@ namespace _4Paws.DTOs.Application.Responses
         public int ApplicantId { get; set; }
         public string ApplicantName { get; set; }
         public string Message { get; set; }
-        public ApplicationStatus Status { get; set; } // Pending, Accepted, Rejected
+        public decimal? ProposedFee { get; set; }
+        public ApplicationStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

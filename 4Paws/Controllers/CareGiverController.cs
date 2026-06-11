@@ -64,5 +64,16 @@ namespace _4Paws.Controllers
             var result = _caregiverService.GetCaregiverById(caregiverId);
             return StatusCode(result.Status, result);
         }
+
+
+        [HttpPut("Bio")]
+        public IActionResult UpdateBio([FromBody] string bio)
+        {
+            var careGiver = _currentCareGiver.GetCurrentCareGiver();
+            if (careGiver == null) return Unauthorized();
+
+            var result = _caregiverService.UpdateBio(careGiver.Id, bio);
+            return StatusCode(result.Status, result);
+        }
     }
 }

@@ -15,29 +15,24 @@ export class ApplicationService {
   constructor(private http: HttpClient) {}
 
   apply(req: ApplyRequest): Observable<ApiResponse<Application>> {
-    return this.http.post<ApiResponse<Application>>(
-      `${this.BASE}/apply`, req
-    );
+    return this.http.post<ApiResponse<Application>>(`${this.BASE}/apply`, req);
   }
 
   getApplicationsForListing(listingId: number): Observable<ApiResponse<Application[]>> {
-    return this.http.get<ApiResponse<Application[]>>(
-      `${this.BASE}/listing/${listingId}`
-    );
+    return this.http.get<ApiResponse<Application[]>>(`${this.BASE}/listing/${listingId}`);
   }
 
   getMyApplications(): Observable<ApiResponse<Application[]>> {
-    return this.http.get<ApiResponse<Application[]>>(
-      `${this.BASE}/my-applications`
-    );
+    return this.http.get<ApiResponse<Application[]>>(`${this.BASE}/my-applications`);
   }
 
   updateStatus(
     applicationId: number,
-    req: UpdateApplicationStatusRequest
+    req: UpdateApplicationStatusRequest,
   ): Observable<ApiResponse> {
     return this.http.put<ApiResponse>(
-      `${this.BASE}/${applicationId}/status`, req
+      `${this.BASE}/${applicationId}/status?status=${req.status}`,
+      {},
     );
   }
 }

@@ -4,6 +4,7 @@ using _4Paws.DTOs.Agreement.Responses;
 using _4Paws.Enums;
 using _4Paws.Helper.CareGiver;
 using _4Paws.Helper.Owner;
+using _4Paws.Helper.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace _4Paws.Services.Agreement
@@ -13,12 +14,14 @@ namespace _4Paws.Services.Agreement
         private readonly DataContext _db;
         private readonly ICurrentOwner _currentOwner;
         private readonly ICurrentCareGiver _currentCareGiver;
+        private readonly ICurrentUserService _currentUser;
 
-        public AgreementService(DataContext db, ICurrentOwner currentOwner, ICurrentCareGiver currentCareGiver)
+        public AgreementService(DataContext db, ICurrentOwner currentOwner, ICurrentCareGiver currentCareGiver, ICurrentUserService currentUser)
         {
             _db = db;
             _currentOwner = currentOwner;
             _currentCareGiver = currentCareGiver;
+            _currentUser = currentUser;
         }
 
         public Result<AgreementResponse> CreateAgreement(int applicationId)
@@ -107,18 +110,19 @@ namespace _4Paws.Services.Agreement
             int? ownerId = owner?.Id;
             int? careGiverId = careGiver?.Id;
 
+            var userId = _currentUser.CurrentUserId(); // inject ICurrentUserService if not already
+
             var agreements = _db.Agreements
+                .Include(x => x.Owner)
+                .Include(x => x.CareGiver)
                 .Where(x => (ownerId != null && x.OwnerId == ownerId) ||
                             (careGiverId != null && x.CareGiverId == careGiverId))
                 .OrderByDescending(x => x.CreatedAt)
                 .ToList();
 
-            if (!agreements.Any())
-                return Result<IEnumerable<AgreementResponse>>.Ok(Enumerable.Empty<AgreementResponse>());
+            var response = agreements.Select(ag => MapToResponse(ag, userId));
 
-            var responseList = agreements.Select(agreement => MapToResponse(agreement));
-
-            return Result<IEnumerable<AgreementResponse>>.Ok(responseList);
+            return Result<IEnumerable<AgreementResponse>>.Ok(response);
         }
 
         public Result<AgreementResponse> CompleteAgreement(int id)
@@ -141,8 +145,11 @@ namespace _4Paws.Services.Agreement
             return Result<AgreementResponse>.Ok(MapToResponse(agreement));
         }
 
-        private AgreementResponse MapToResponse(Models.Agreement agreement)
+        private AgreementResponse MapToResponse(Models.Agreement agreement, int userId = 0)
         {
+            bool hasReviewed = userId > 0 && _db.Reviews
+                .Any(r => r.AgreementId == agreement.Id && r.ReviewerId == userId);
+
             return new AgreementResponse
             {
                 Id = agreement.Id,
@@ -153,6 +160,10 @@ namespace _4Paws.Services.Agreement
                 OwnerId = agreement.OwnerId,
                 CareGiverId = agreement.CareGiverId,
                 PetId = agreement.PetId,
+                CompleteAt = agreement.CompleteAt,
+                OwnerUserId = agreement.Owner?.UserId ?? 0,
+                CareGiverUserId = agreement.CareGiver?.UserId ?? 0,
+                HasReviewed = hasReviewed,
             };
         }
     }

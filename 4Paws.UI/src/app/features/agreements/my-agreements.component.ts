@@ -94,15 +94,24 @@ export class MyAgreementsComponent implements OnInit {
     });
   }
 
-  leaveReview(ag: Agreement) {
-    this.router.navigate(['/leave-review'], {
-      queryParams: {
-        agreementId: ag.id,
-        careGiverId: ag.careGiverId,
-        name: 'CareGiver',
-      }
-    });
-  }
+leaveReview(ag: Agreement) {
+  const token = this.authService.getToken();
+  if (!token) return;
+
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  const userId: number = +payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+
+  const iAmOwner = ag.ownerUserId === userId;
+
+  this.router.navigate(['/leave-review'], {
+    queryParams: {
+      agreementId: ag.id,
+      ownerId:     iAmOwner ? undefined : ag.ownerId,
+      careGiverId: iAmOwner ? ag.careGiverId : undefined,
+      name:        iAmOwner ? 'CareGiver' : 'Owner',
+    }
+  });
+}
 
   goBack() { this.router.navigate(['/profile']); }
   logout() { this.authService.logout(); this.router.navigate(['/login']); }

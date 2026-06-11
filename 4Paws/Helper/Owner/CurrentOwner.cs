@@ -1,5 +1,6 @@
 ﻿using _4Paws.Data;
 using _4Paws.Helper.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace _4Paws.Helper.Owner
 {
@@ -20,7 +21,7 @@ namespace _4Paws.Helper.Owner
             if (userId == 0)
                 return null;
 
-            return _db.Owners.FirstOrDefault(x => x.UserId == userId);
+            return _db.Owners.Include(x => x.User).FirstOrDefault(x => x.UserId == userId);
         }
     }
 }

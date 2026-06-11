@@ -15,9 +15,7 @@ export class CaregiverService {
   // ─── Get Dashboard ────────────────────────────────────────────────────────
 
   getDashboard(): Observable<ApiResponse<CaregiverDashboard>> {
-    return this.http.get<ApiResponse<CaregiverDashboard>>(
-      `${this.BASE_URL}/Dashboard`
-    );
+    return this.http.get<ApiResponse<CaregiverDashboard>>(`${this.BASE_URL}/Dashboard`);
   }
 
   // ─── Get My Listings ──────────────────────────────────────────────────────
@@ -36,5 +34,13 @@ export class CaregiverService {
 
   getPublicProfile(caregiverId: number): Observable<ApiResponse> {
     return this.http.get<ApiResponse>(`${this.BASE_URL}/Profile/${caregiverId}`);
+  }
+
+  // ─── Update Bio ───────────────────────────────────────────────────────────
+
+  updateBio(bio: string): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(`${this.BASE_URL}/Bio`, JSON.stringify(bio), {
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
