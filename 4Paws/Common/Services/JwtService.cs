@@ -10,6 +10,8 @@ namespace _4Paws.Common.Services
     {
         private readonly IConfiguration _config;
 
+        public JwtService() { }
+
         public JwtService(IConfiguration config) => _config = config;
 
         public string GenerateJwtToken(UserModel user)
