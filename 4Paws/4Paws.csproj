@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Folder Include="DTOs\Agreement\Requests\" />
+    <Folder Include="Scripts\" />
   </ItemGroup>
 
 </Project>
