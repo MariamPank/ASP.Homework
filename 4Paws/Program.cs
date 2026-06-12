@@ -3,6 +3,7 @@ using _4Paws.Data;
 using _4Paws.Extensions;
 using _4Paws.Helper.Owner;
 using _4Paws.Helper.Services;
+using _4Paws.Middlewares;
 using _4Paws.Services.Agreement;
 using _4Paws.Services.Application;
 using _4Paws.Services.Auth;
@@ -25,6 +26,7 @@ namespace _4Paws
             builder.Services.AddServices(builder.Configuration);
 
             var app = builder.Build();
+            app.UseMiddleware<LoggingMiddleware>();
 
             app.UseApp();
             app.Run();

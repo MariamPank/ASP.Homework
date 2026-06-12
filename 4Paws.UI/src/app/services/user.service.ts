@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../models/auth.models';
 import { UserProfile, EditUserRequest, ChangePasswordRequest} from '../models/feature.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private readonly BASE = 'http://localhost:5281/api/Users';
+  private readonly BASE = `${environment.apiUrl}/Users`;
 
   constructor(private http: HttpClient) {}
 

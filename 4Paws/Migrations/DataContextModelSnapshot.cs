@@ -39,7 +39,7 @@ namespace _4Paws.Migrations
                     b.Property<int>("CareGiverId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CompleteAt")
+                    b.Property<DateTime?>("CompleteAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAt")
@@ -58,7 +58,6 @@ namespace _4Paws.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 

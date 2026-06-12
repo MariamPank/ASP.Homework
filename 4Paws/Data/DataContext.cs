@@ -13,7 +13,7 @@ namespace _4Paws.Data
         public DbSet<Listing> Listings { get; set; }
         public DbSet<Application> Applications { get; set; }
         public DbSet<Agreement> Agreements { get; set; }
-        public DbSet<Review> Reviews { get; set; }  // ← new
+        public DbSet<Review> Reviews { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

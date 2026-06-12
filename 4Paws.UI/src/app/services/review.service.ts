@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../models/auth.models';
 import { Review, CreateReviewRequest } from '../models/review.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ReviewService {
-  private readonly BASE = 'http://localhost:5281/api/Reviews';
+  private readonly BASE = `${environment.apiUrl}/Reviews`;
 
   constructor(private http: HttpClient) {}
 

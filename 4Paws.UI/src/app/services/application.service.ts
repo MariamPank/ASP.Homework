@@ -7,10 +7,11 @@ import {
   ApplyRequest,
   UpdateApplicationStatusRequest,
 } from '../models/application.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ApplicationService {
-  private readonly BASE = 'http://localhost:5281/api/Applications';
+  private readonly BASE = `${environment.apiUrl}/Applications`;
 
   constructor(private http: HttpClient) {}
 

@@ -6,6 +6,7 @@ import { ReviewService } from '../../services/review.service';
 import { AuthService } from '../../services/auth.service';
 import { Review, Rating } from '../../models/review.models';
 import { ApiResponse } from '../../models/auth.models';
+import { environment } from '../../../environments/environment';
 
 interface PublicOwnerProfile {
   id: number;
@@ -36,7 +37,7 @@ export class PublicProfileComponent implements OnInit {
   private router        = inject(Router);
   private cdr           = inject(ChangeDetectorRef);
 
-  readonly BASE = 'http://localhost:5281/api';
+  readonly BASE = environment.apiUrl;
 
   profileType: 'owner' | 'caregiver' = 'owner';
   profileId: number = 0;

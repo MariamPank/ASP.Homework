@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { OwnerDashboard } from '../models/feature.models';
 import { ApiResponse } from '../models/auth.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OwnerService {
-  private readonly BASE_URL = 'http://localhost:5281/api/Owner';
+  private readonly BASE_URL = `${environment.apiUrl}/Owner`;
 
   constructor(private http: HttpClient) {}
 

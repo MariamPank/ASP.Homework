@@ -57,7 +57,6 @@ namespace _4Paws.Extensions
             // Built-in in-memory cache — no extra packages needed.
             // Caches: all open listings, owner/caregiver profiles,
             //         dashboards, and admin stats (5 min TTL each).
-            // Mention Redis as future upgrade for horizontal scaling.
             services.AddMemoryCache();
 
             services.AddHttpContextAccessor();

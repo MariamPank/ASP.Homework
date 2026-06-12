@@ -9,12 +9,13 @@ import {
   AuthResponse,
   ApiResponse,
 } from '../models/auth.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly BASE_URL = 'http://localhost:5281/api/auth';
+  private readonly BASE_URL = `${environment.apiUrl}/auth`;
 
   constructor(private http: HttpClient) {}
 

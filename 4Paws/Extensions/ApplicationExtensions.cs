@@ -11,10 +11,6 @@
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            else
-            {
-                app.UseHttpsRedirection();
-            }
 
             // ── Serve uploaded images as static files ─────────────────────
             // Files in wwwroot/ are served at their path e.g.:

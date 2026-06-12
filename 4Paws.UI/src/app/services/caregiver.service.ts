@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CaregiverDashboard } from '../models/feature.models';
 import { ApiResponse } from '../models/auth.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CaregiverService {
-  private readonly BASE_URL = 'http://localhost:5281/api/CareGiver';
+  private readonly BASE_URL = `${environment.apiUrl}/CareGiver`;
 
   constructor(private http: HttpClient) {}
 

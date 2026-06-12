@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../models/auth.models';
 import { Agreement } from '../models/agreement.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AgreementService {
-  private readonly BASE = 'http://localhost:5281/api/Agreements';
+  private readonly BASE = `${environment.apiUrl}/Agreements`;
 
   constructor(private http: HttpClient) {}
 

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../models/auth.models';
+import { environment } from '../../environments/environment';
 
 export interface AdminUser {
   id: number;
@@ -62,7 +63,7 @@ export interface AdminAgreement {
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  private readonly BASE = 'http://localhost:5281/api/Admin';
+  private readonly BASE = `${environment.apiUrl}/Admin`;
 
   constructor(private http: HttpClient) {}
 

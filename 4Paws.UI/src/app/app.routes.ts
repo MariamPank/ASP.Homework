@@ -25,7 +25,7 @@ export const routes: Routes = [
   { path: 'verify-email',           component: VerifyEmailComponent },
   { path: 'forgot-password',        component: ForgotPasswordComponent },
   { path: 'reset-password',         component: ResetPasswordComponent },
-  { path: 'profile',                component: RoleSelectComponent },
+  { path: 'profile',                component: RoleSelectComponent,     canActivate: [authGuard] },
   { path: 'my-profile',             component: ProfilePageComponent,    canActivate: [authGuard] },
   { path: 'owner-dashboard',        component: OwnerDashboardComponent, canActivate: [authGuard] },
   { path: 'caregiver-dashboard',    component: CaregiverDashboardComponent, canActivate: [authGuard] },

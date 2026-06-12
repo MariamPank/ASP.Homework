@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../models/auth.models';
 import { Pet, CreatePetRequest, UpdatePetRequest } from '../models/feature.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class PetService {
-  private readonly BASE = 'http://localhost:5281/api/Pet';
+  private readonly BASE = `${environment.apiUrl}/Pet`;
 
   constructor(private http: HttpClient) {}
 
@@ -30,13 +31,13 @@ export class PetService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.put<ApiResponse<string>>(
-      `http://localhost:5281/api/Pet/${id}/image`, formData
+      `${environment.apiUrl}/Pet/${id}/image`, formData
     );
   }
 
   deleteImage(id: number): Observable<ApiResponse> {
     return this.http.delete<ApiResponse>(
-      `http://localhost:5281/api/Pet/${id}/image`
+      `${environment.apiUrl}/Pet/${id}/image`
     );
   }
 }

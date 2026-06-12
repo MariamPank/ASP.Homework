@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../models/auth.models';
 import { Listing, CreateListingRequest, UpdateListingRequest } from '../models/feature.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ListingService {
-  private readonly BASE = 'http://localhost:5281/api/Listings';
+  private readonly BASE = `${environment.apiUrl}/Listings`;
 
   constructor(private http: HttpClient) {}
 
